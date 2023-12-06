@@ -14,6 +14,9 @@
 // Third Party Libraries
 #include <Eigen/Eigen>
 
+// Custom Libraries
+#include <double_integrator_test/bezier_utilities.hpp>
+
 // CLASSES
 class DoubleIntegratorGovernor : public rclcpp::Node {
 	public:
@@ -22,6 +25,7 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 
 	private:
 		// FUNCTIONS
+		void debugCallback();
 		void stateMachine();
 		void actionCallback(const std_msgs::msg::Empty msg);
 		void odometryCallback(const px4_msgs::msg::VehicleOdometry::SharedPtr msg);
@@ -49,6 +53,8 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		governor_state agent_state;
 		bool transition_takeoff;
 		bool transition_takeoff_reached;
+
+		BezierCurve test_curve;
 
 		// ROS2 VARIABLES
 		// Timers

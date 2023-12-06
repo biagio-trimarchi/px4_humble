@@ -30,6 +30,14 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	agent_state = INIT;
 	transition_takeoff = false;
 	transition_takeoff_reached = false;
+
+	test_curve = BezierCurve(2, 1, 1.0);
+	Eigen::VectorXd point1 {{0.0}};
+	Eigen::VectorXd point2 {{2.0}};
+	Eigen::VectorXd point3 {{3.0}};
+	test_curve.set_control_point(0, point1);
+	test_curve.set_control_point(1, point2);
+	test_curve.set_control_point(2, point3);
 	
 	// QoS
 	rmw_qos_profile_t qos_profile_sensor_data = rmw_qos_profile_sensor_data;
@@ -51,7 +59,7 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	
 	state_machine_timer = this->create_wall_timer(
 				std::chrono::milliseconds(state_machine_timer_frequency_ms),
-				std::bind(&DoubleIntegratorGovernor::stateMachine, this)
+				std::bind(&DoubleIntegratorGovernor::debugCallback, this)
 			);
 
 	// SUBSCRIPTIONS
@@ -80,6 +88,10 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 
 DoubleIntegratorGovernor::~DoubleIntegratorGovernor() {}
 
+void DoubleIntegratorGovernor::debugCallback() {
+	RCLCPP_INFO(this->get_logger(), "Evaluation: %f", (test_curve.evaluate(0.1))(0));	
+}
+
 void DoubleIntegratorGovernor::stateMachine() {
 	switch(agent_state) {
 		case INIT:
@@ -101,6 +113,9 @@ void DoubleIntegratorGovernor::stateMachine() {
 			if (transition_takeoff_reached) {
 				RCLCPP_INFO(this->get_logger(), "[TAKEOFF] Reached takeoff altitude");
 			}
+			break;
+
+		case HOVER:
 			break;
 
 		case CIRCLE:

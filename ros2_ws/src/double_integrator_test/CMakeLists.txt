@@ -17,7 +17,7 @@ include_directories(
 	${EIGEN3_INCLUDE_DIRS}
 )
 
-add_executable(governor_node src/double_integrator.cpp)
+add_executable(governor_node src/double_integrator.cpp src/bezier_utilities.cpp)
 ament_target_dependencies(governor_node
 	rclcpp px4_msgs Eigen3 std_msgs
 )
