@@ -31,14 +31,12 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	transition_takeoff = false;
 	transition_takeoff_reached = false;
 
-	test_curve = BezierCurve(2, 1, 1.0);
-	Eigen::VectorXd point1 {{0.0}};
-	Eigen::VectorXd point2 {{2.0}};
-	Eigen::VectorXd point3 {{3.0}};
-	test_curve.set_control_point(0, point1);
-	test_curve.set_control_point(1, point2);
-	test_curve.set_control_point(2, point3);
-	
+	std::vector<float> control_points;
+	control_points.push_back(0.0);
+	control_points.push_back(2.0);
+	control_points.push_back(5.0);
+	test_bez = BezierParameterization(2, control_points, 20.0);
+
 	// QoS
 	rmw_qos_profile_t qos_profile_sensor_data = rmw_qos_profile_sensor_data;
 	rclcpp::QoS qos_sensor_data = rclcpp::QoS(
@@ -89,7 +87,8 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 DoubleIntegratorGovernor::~DoubleIntegratorGovernor() {}
 
 void DoubleIntegratorGovernor::debugCallback() {
-	RCLCPP_INFO(this->get_logger(), "Evaluation: %f", (test_curve.evaluate(0.1))(0));	
+	std::cout << "Identity: (0) " << test_param.evaluate_function(0.2) << std::endl;
+	std::cout << "Bezier test: (0) " << test_bez.evaluate_function(20) << std::endl;
 }
 
 void DoubleIntegratorGovernor::stateMachine() {

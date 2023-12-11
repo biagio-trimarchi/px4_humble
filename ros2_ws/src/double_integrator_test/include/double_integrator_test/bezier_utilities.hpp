@@ -13,14 +13,18 @@ class BezierCurve {
 	public:
 		// Constructors - Destructor
 		BezierCurve();
-		BezierCurve(int _order, int _dimension, double _duration);
+		BezierCurve(unsigned int _order, int _dimension, double _duration);
 		~BezierCurve();
 
 		// Functions
 		Eigen::VectorXd evaluate(double time);	
+		Eigen::VectorXd evaluate_derivative(double time, int derivative_order);	
 		void set_control_point(int index, Eigen::VectorXd &point);
 
 	private:
+		// Functions
+		Eigen::MatrixXd compute_derivation_matrix(int derivative_order);
+
 		// Variables
 		int order;
 		int dimension;

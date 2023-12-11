@@ -16,6 +16,7 @@
 
 // Custom Libraries
 #include <double_integrator_test/bezier_utilities.hpp>
+#include <double_integrator_test/trajectory.hpp>
 
 // CLASSES
 class DoubleIntegratorGovernor : public rclcpp::Node {
@@ -54,7 +55,8 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		bool transition_takeoff;
 		bool transition_takeoff_reached;
 
-		BezierCurve test_curve;
+		Parameterization test_param;
+		BezierParameterization test_bez;
 
 		// ROS2 VARIABLES
 		// Timers
