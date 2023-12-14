@@ -33,12 +33,10 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 
 	// Debug
 	debug_time = 0.0;
-	std::vector<float> control_points = {0.0, 0.0, 0.0, M_PI, M_PI, 2.0*M_PI, 2.0*M_PI, 2.0*M_PI};
-	auto param_test = std::make_shared<BezierParameterization>(7, control_points, 2.0 * M_PI); 
 	Eigen::Vector3d center(0.0, 0.0, 0.0);
 	trajectory_debug_1 = CircleSegment(2.0 * M_PI, 2.0, center, 1.0);  
-	trajectory_debug_2 = CircleSegment(2.0 * M_PI, 2.0, center, 1.0);  
-	trajectory_debug_2.set_parameterization(param_test);
+	trajectory_debug_2 = CircleSegment(2.0 * M_PI, 1.0, center, 1.0);  
+	trajectory_debug_3 = CircleSegment(2.0 * M_PI, 2.0, center, 2.0);  
 
 	// QoS
 	rmw_qos_profile_t qos_profile_sensor_data = rmw_qos_profile_sensor_data;
@@ -84,11 +82,11 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 			);
 	
 	trajectory_visualizer_publisher = this->create_publisher<visualization_msgs::msg::Marker>(
-				"/trajectory_markers", qos_sensor_data
+				"/trajectory_markers1", qos_sensor_data
 			);
 
 	setpoint_visualizer_publisher = this->create_publisher<visualization_msgs::msg::Marker>(
-				"/setpoint_marker", qos_sensor_data
+				"/setpoint_marker1", qos_sensor_data
 			);
 	// TF
 	tf2_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this); 	
@@ -117,6 +115,7 @@ void DoubleIntegratorGovernor::debugCallback() {
 	if (debug_time > 2*M_PI) debug_time = 0.0;
 	Eigen::Vector3d marker_position_1 = trajectory_debug_1.get_position(debug_time);
 	Eigen::Vector3d marker_position_2 = trajectory_debug_2.get_position(debug_time);
+	Eigen::Vector3d marker_position_3 = trajectory_debug_3.get_position(debug_time);
 
 	// Prepare trajectory
 	visualization_msgs::msg::Marker trajectory_markers1;
@@ -165,15 +164,44 @@ void DoubleIntegratorGovernor::debugCallback() {
 	trajectory_markers2.scale.y = 0.1;
 	trajectory_markers2.scale.z = 0.0;
 	trajectory_markers2.color.a = 1.0;
-	trajectory_markers2.color.r = 0.0;
-	trajectory_markers2.color.g = 0.0;
-	trajectory_markers2.color.b = 0.0;
+	trajectory_markers2.color.r = 1.0;
+	trajectory_markers2.color.g = 1.0;
+	trajectory_markers2.color.b = 1.0;
 	trajectory_markers2.points = std::vector<geometry_msgs::msg::Point>(30);
 	for (double i = 0; i < 30; i++){
 		Eigen::Vector3d point = trajectory_debug_2.get_position(2*M_PI / 30.0 * i);;
 		trajectory_markers2.points[i].x = point.x();
 		trajectory_markers2.points[i].y = point.y();
 		trajectory_markers2.points[i].z = point.z();
+	}
+
+	// Prepare trajectory
+	visualization_msgs::msg::Marker trajectory_markers3;
+	trajectory_markers3.header.stamp = this->get_clock()->now();
+	trajectory_markers3.header.frame_id = "map";
+	trajectory_markers3.id = 2;
+	trajectory_markers3.type = visualization_msgs::msg::Marker::POINTS;
+	trajectory_markers3.action = visualization_msgs::msg::Marker::ADD;
+	trajectory_markers3.pose.position.x = 0.0;
+	trajectory_markers3.pose.position.y = 0.0;
+	trajectory_markers3.pose.position.z = 0.0;
+	trajectory_markers3.pose.orientation.w = 1.0;
+	trajectory_markers3.pose.orientation.x = 0.0;
+	trajectory_markers3.pose.orientation.y = 0.0;
+	trajectory_markers3.pose.orientation.z = 0.0;
+	trajectory_markers3.scale.x = 0.1;
+	trajectory_markers3.scale.y = 0.1;
+	trajectory_markers3.scale.z = 0.0;
+	trajectory_markers3.color.a = 1.0;
+	trajectory_markers3.color.r = 0.0;
+	trajectory_markers3.color.g = 0.0;
+	trajectory_markers3.color.b = 0.0;
+	trajectory_markers3.points = std::vector<geometry_msgs::msg::Point>(30);
+	for (double i = 0; i < 30; i++){
+		Eigen::Vector3d point = trajectory_debug_3.get_position(2*M_PI / 30.0 * i);;
+		trajectory_markers3.points[i].x = point.x();
+		trajectory_markers3.points[i].y = point.y();
+		trajectory_markers3.points[i].z = point.z();
 	}
 
 	// Prepare setpoint
@@ -193,7 +221,7 @@ void DoubleIntegratorGovernor::debugCallback() {
 	setpoint_marker1.scale.x = 1.0;
 	setpoint_marker1.scale.y = 1.0;
 	setpoint_marker1.scale.z = 1.0;
-	setpoint_marker1.color.a = 0.5;
+	setpoint_marker1.color.a = 1.0;
 	setpoint_marker1.color.r = 1.0;
 	setpoint_marker1.color.g = 0.0;
 	setpoint_marker1.color.b = 0.0;
@@ -216,15 +244,39 @@ void DoubleIntegratorGovernor::debugCallback() {
 	setpoint_marker2.scale.y = 0.5;
 	setpoint_marker2.scale.z = 0.5;
 	setpoint_marker2.color.a = 1.0;
-	setpoint_marker2.color.r = 0.0;
-	setpoint_marker2.color.g = 1.0;
+	setpoint_marker2.color.r = 1.0;
+	setpoint_marker2.color.g = 0.0;
 	setpoint_marker2.color.b = 0.0;
+
+	// Prepare setpoint
+	visualization_msgs::msg::Marker setpoint_marker3;
+	setpoint_marker3.header.stamp = this->get_clock()->now();
+	setpoint_marker3.header.frame_id = "map";
+	setpoint_marker3.id = 5;
+	setpoint_marker3.type = visualization_msgs::msg::Marker::SPHERE;
+	setpoint_marker3.action = visualization_msgs::msg::Marker::ADD;
+	setpoint_marker3.pose.position.x = marker_position_3.x();
+	setpoint_marker3.pose.position.y = marker_position_3.y();
+	setpoint_marker3.pose.position.z = marker_position_3.z();
+	setpoint_marker3.pose.orientation.w = 1.0;
+	setpoint_marker3.pose.orientation.x = 0.0;
+	setpoint_marker3.pose.orientation.y = 0.0;
+	setpoint_marker3.pose.orientation.z = 0.0;
+	setpoint_marker3.scale.x = 0.5;
+	setpoint_marker3.scale.y = 0.5;
+	setpoint_marker3.scale.z = 0.5;
+	setpoint_marker3.color.a = 1.0;
+	setpoint_marker3.color.r = 0.0;
+	setpoint_marker3.color.g = 1.0;
+	setpoint_marker3.color.b = 0.0;
 
 	// Send messages
 	trajectory_visualizer_publisher->publish(trajectory_markers1);
 	trajectory_visualizer_publisher->publish(trajectory_markers2);
+	trajectory_visualizer_publisher->publish(trajectory_markers3);
 	setpoint_visualizer_publisher->publish(setpoint_marker1);
 	setpoint_visualizer_publisher->publish(setpoint_marker2);
+	setpoint_visualizer_publisher->publish(setpoint_marker3);
 }
 
 void DoubleIntegratorGovernor::stateMachine() {

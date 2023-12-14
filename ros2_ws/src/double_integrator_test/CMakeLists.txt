@@ -10,7 +10,11 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(px4_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
 
 include_directories(
 	${PROJECT_SOURCE_DIR}/include
@@ -19,7 +23,7 @@ include_directories(
 
 add_executable(governor_node src/double_integrator.cpp src/bezier_utilities.cpp src/trajectory.cpp)
 ament_target_dependencies(governor_node
-	rclcpp px4_msgs Eigen3 std_msgs
+	rclcpp px4_msgs Eigen3 std_msgs visualization_msgs geometry_msgs tf2 tf2_ros
 )
 
 install( TARGETS governor_node DESTINATION lib/${PROJECT_NAME})

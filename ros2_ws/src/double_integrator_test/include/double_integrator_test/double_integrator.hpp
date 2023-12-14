@@ -7,9 +7,15 @@
 #include <px4_msgs/msg/vehicle_odometry.hpp>
 #include <px4_msgs/msg/trajectory_setpoint.hpp>
 #include <px4_msgs/msg/offboard_control_mode.hpp>
+#include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+#include <geometry_msgs/msg/point.hpp>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 // C++ Standard Libraries
 #include <chrono>
+#include <math.h>
 
 // Third Party Libraries
 #include <Eigen/Eigen>
@@ -55,8 +61,11 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		bool transition_takeoff;
 		bool transition_takeoff_reached;
 
-		Parameterization test_param;
-		BezierParameterization test_bez;
+		// Debug
+		double debug_time;
+		CircleSegment trajectory_debug_1;
+		CircleSegment trajectory_debug_2;
+		CircleSegment trajectory_debug_3;
 
 		// ROS2 VARIABLES
 		// Timers
@@ -70,4 +79,9 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		// Publishers
 		rclcpp::Publisher<px4_msgs::msg::TrajectorySetpoint>::SharedPtr setpoint_publisher;
 		rclcpp::Publisher<px4_msgs::msg::OffboardControlMode>::SharedPtr offboard_publisher;
+		rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr trajectory_visualizer_publisher;
+		rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr setpoint_visualizer_publisher;
+
+		// TF2
+		std::shared_ptr<tf2_ros::TransformBroadcaster> tf2_broadcaster; 
 };

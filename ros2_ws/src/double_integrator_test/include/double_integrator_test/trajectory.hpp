@@ -4,6 +4,7 @@
 // C++ Standard Libraries
 #include <vector>
 #include <memory>
+#include <cmath>
 
 // Third Party Libraries
 #include <Eigen/Eigen>
@@ -18,13 +19,13 @@ class Parameterization {
 		~Parameterization();
 
 		// Functions
-		double evaluate_function(double time);
-		double evaluate_first_derivative(double time);
-		double evaluate_second_derivative(double time);
+		virtual double evaluate_function(double time);
+		virtual double evaluate_first_derivative(double time);
+		virtual double evaluate_second_derivative(double time);
 	private:
 };
 
-class BezierParameterization : Parameterization {
+class BezierParameterization : public Parameterization {
 	public:
 		// Constructors/Destructor
 		BezierParameterization();
@@ -43,28 +44,35 @@ class TrajectorySegment {
 	public:
 		// Constructors/destructor
 		TrajectorySegment();
-		TrajectorySegment(double _duration, unsigned int _dimension);
+		TrajectorySegment(double _duration);
+		~TrajectorySegment();
+
+		// Functions
+		Eigen::Vector3d get_position(double time);
 		Eigen::Vector3d get_velocity(double time);
 		Eigen::Vector3d get_acceleration(double time);
-		void set_parameterization(const std::shared_ptr<Parameterization> new_param);
+		void set_parameterization(const std::shared_ptr<Parameterization>& new_param);
 		void unset_parameterization();
 
 	protected:
 		// Variables
 		double duration;
-		unsigned int dimension;
 		bool is_time_parameterized;
 		std::shared_ptr<Parameterization> parameterization;
 };
 
-class CircleSegment : TrajectorySegment {
+class CircleSegment : public TrajectorySegment {
 	public:
 		// Constructors/destructor
 		CircleSegment();
 		CircleSegment(double _duration,
-                  unsigned int _dimension, 
-                  Eigen::Vector3d &_radius,
+                  double _radius,
                   Eigen::Vector3d &_center,
+                  double _angular_velocity);
+		CircleSegment(double _duration,
+                  double _radius,
+                  Eigen::Vector3d &_center,
+                  double _angular_velocity,
 									Eigen::Matrix3d &_orientation);
 		~CircleSegment();
 
@@ -74,10 +82,11 @@ class CircleSegment : TrajectorySegment {
 		Eigen::Vector3d get_acceleration(double time);
 
 	private:
-		Eigen::Vector3d radius;
+		double radius;
 		Eigen::Vector3d center;
+		double angular_velocity;
 		Eigen::Matrix3d orientation;
-}
+};
 
 class Trajectory {
 	public:

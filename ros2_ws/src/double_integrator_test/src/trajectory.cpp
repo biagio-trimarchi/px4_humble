@@ -54,20 +54,19 @@ double BezierParameterization::evaluate_second_derivative(double time) {
 // Base template
 TrajectorySegment::TrajectorySegment() {}
 
-TrajectorySegment::TrajectorySegment(double _duration, unsigned int _dimension) {
+TrajectorySegment::TrajectorySegment(double _duration) {
 	duration = _duration;
-	dimension = _dimension;
 	is_time_parameterized = false;
 }
 
 TrajectorySegment::~TrajectorySegment() {}
 
-TrajectorySegment::set_parameterization(const std::shared_ptr<Parameterization> new_param) {
+void TrajectorySegment::set_parameterization(const std::shared_ptr<Parameterization>& new_param) {
 	parameterization = new_param;
 	is_time_parameterized = true;
 }
 
-TrajectorySegment::unset_parameterization() {
+void TrajectorySegment::unset_parameterization() {
 	parameterization.reset();
 	is_time_parameterized = false;
 }
@@ -76,18 +75,90 @@ TrajectorySegment::unset_parameterization() {
 CircleSegment::CircleSegment() {}
 
 CircleSegment::CircleSegment(double _duration, 
-                             unsigned int _dimension,
-                             Eigen::VectorXd &_radius,
-														 Eigen::VectorXd &_center,
-                             double angular_velocity,
-                             Eigen::Matrix3d &_orientation) : TrajectorySegment(_duration, _dimension) {
+                             double _radius,
+														 Eigen::Vector3d &_center,
+                             double _angular_velocity) : TrajectorySegment(_duration) {
 	radius = _radius;
 	center = _center;
+	angular_velocity = _angular_velocity;
+	orientation = Eigen::Matrix3d::Identity();
+}
+
+CircleSegment::CircleSegment(double _duration, 
+                             double _radius,
+														 Eigen::Vector3d &_center,
+                             double _angular_velocity,
+                             Eigen::Matrix3d &_orientation) : TrajectorySegment(_duration) {
+	radius = _radius;
+	center = _center;
+	angular_velocity = _angular_velocity;
 	orientation = _orientation;
 }
 
-Eigen::Vector3d CircleSegment::get_position(double time) {
-	Eigen::Vector3d result = Eigen::VectorXd::Zero(dimension);
+CircleSegment::~CircleSegment() {}
 
-		
+Eigen::Vector3d CircleSegment::get_position(double time) {
+	Eigen::Vector3d result = Eigen::Vector3d::Zero();
+	double s = time;
+
+	if (time < 0 || time > duration) {
+		std::cerr << "[Trajectory Segment] (get_position) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	if (is_time_parameterized) {
+		s = parameterization->evaluate_function(time);
+	}
+
+	result.x() = center.x() + radius * cos(angular_velocity * s);	
+	result.y() = center.y() + radius * sin(angular_velocity * s);	
+	return orientation * result;
 }
+
+Eigen::Vector3d CircleSegment::get_velocity(double time) {
+	Eigen::Vector3d result = Eigen::Vector3d::Zero();
+	double s = time;
+	double ds = 1.0;
+
+	if (time < 0 || time > duration) {
+		std::cerr << "[Trajectory Segment] (get_velocity) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	if (is_time_parameterized) {
+		s = parameterization->evaluate_function(time);
+		ds = parameterization->evaluate_first_derivative(time);
+	}
+	
+	result.x() = - ds * angular_velocity * radius * sin(angular_velocity * s);
+	result.y() =   ds * angular_velocity * radius * cos(angular_velocity * s);
+
+	return orientation * result;
+}
+
+Eigen::Vector3d CircleSegment::get_acceleration(double time) {
+	Eigen::Vector3d result = Eigen::Vector3d::Zero();
+	double s = time;
+	double ds = 1.0;
+	double dds = 1.0;
+
+	if (time < 0 || time > duration) {
+		std::cerr << "[Trajectory Segment] (get_acceleration) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	if (is_time_parameterized) {
+		s = parameterization->evaluate_function(time);
+		ds = parameterization->evaluate_first_derivative(time);
+		dds = parameterization->evaluate_second_derivative(time);
+	}
+	
+	result.x() = - pow(ds * angular_velocity, 2.0) * radius * cos(angular_velocity * s) - 
+	                        dds * angular_velocity * radius * sin(angular_velocity * s);
+	result.y() = - pow(ds * angular_velocity, 2.0) * radius * sin(angular_velocity * s) + 
+		                      dds * angular_velocity * radius * cos(angular_velocity * s);
+
+	return orientation * result;
+}
+
+// Bezier Segment
