@@ -71,6 +71,10 @@ void TrajectorySegment::unset_parameterization() {
 	is_time_parameterized = false;
 }
 
+double TrajectorySegment::get_duration() {
+	return duration;
+}
+
 // Circle Segment
 CircleSegment::CircleSegment() {}
 
@@ -341,4 +345,63 @@ Eigen::Vector3d BezierSegment::get_acceleration(double time) {
 
 	result = ds * duration *  bezier_curve.evaluate_derivative(duration * s, 1);
 	return result;
+}
+
+// Trajectory
+Trajectory::Trajectory() {}
+
+Trajectory::~Trajectory() {}
+
+Eigen::Vector3d Trajectory::evaluate_position(double time) {
+	Eigen::Vector3d result;
+
+	double cumulated_segments_time = 0;
+	int segment_index;	
+	for (segment_index = 0; segment_index < segments.size() && cumulated_segments_time < time; segment_index++) {
+		cumulated_segments += segments[segment_index].get_duration();
+	}
+	if (cumulated_segments_time < time) {
+		std::cerr << "[Trajectory] (evaluate_position) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	result = segments[segment_index].get_position(time - cumulated_segments_time);
+
+	return result;	
+}
+
+Eigen::Vector3d Trajectory::evaluate_velocity(double time) {
+	Eigen::Vector3d result;
+
+	double cumulated_segments_time = 0;
+	int segment_index;	
+	for (segment_index = 0; segment_index < segments.size() && cumulated_segments_time < time; segment_index++) {
+		cumulated_segments += segments[segment_index].get_duration();
+	}
+	if (cumulated_segments_time < time) {
+		std::cerr << "[Trajectory] (evaluate_position) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	result = segments[segment_index].get_velocity(time - cumulated_segments_time);
+
+	return result;	
+}
+
+Eigen::Vector3d Trajectory::evaluate_acceleration(double time) {
+	Eigen::Vector3d result;
+
+	double cumulated_segments_time = 0;
+	int segment_index;	
+	for (segment_index = 0; segment_index < segments.size() && cumulated_segments_time < time; segment_index++) {
+		cumulated_segments += segments[segment_index].get_duration();
+	}
+	if (cumulated_segments_time < time) {
+		std::cerr << "[Trajectory] (evaluate_position) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	result = segments[segment_index].get_acceleration(time - cumulated_segments_time);
+
+	return result;	
 }

@@ -55,6 +55,7 @@ class TrajectorySegment {
 		Eigen::Vector3d get_acceleration(double time);
 		void set_parameterization(const std::shared_ptr<Parameterization>& new_param);
 		void unset_parameterization();
+		double get_duration();
 
 	protected:
 		// Variables
@@ -147,9 +148,9 @@ class Trajectory {
 		~Trajectory();
 	private:
 		// Functions
-		Eigen::Vector3d evaluate_trajectory_position(double actual_time);
-		Eigen::Vector3d evaluate_trajectory_velocity(double actual_time);
-		Eigen::Vector3d evaluate_trajectory_acceleration(double actual_time);
+		Eigen::Vector3d evaluate_position(double actual_time);
+		Eigen::Vector3d evaluate_velocity(double actual_time);
+		Eigen::Vector3d evaluate_acceleration(double actual_time);
 		void add_new_segment();
 		void delete_trajectory();
 
