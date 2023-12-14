@@ -107,6 +107,7 @@ class SpiralSegment : public TrajectorySegment {
                   double _angular_velocity,
                   bool _is_direction_down,
                   Eigen::Matrix3d &_orientation);
+		~SpiralSegment();
 
 		// Functions
 		Eigen::Vector3d get_position(double time);
@@ -120,6 +121,24 @@ class SpiralSegment : public TrajectorySegment {
 		double angular_velocity;
 		bool is_direction_down;
 		Eigen::Matrix3d orientation;
+};
+
+class BezierSegment : public TrajectorySegment {
+	public:
+	// Constructors/destructor
+	BezierSegment();
+	BezierSegment(double _duration,
+                unsigned int _order,
+                std::vector<Eigen::Vector3d> &control_points);
+	~BezierSegment();
+	
+	// Functions
+	Eigen::Vector3d get_position(double time);
+	Eigen::Vector3d get_velocity(double time);
+	Eigen::Vector3d get_acceleration(double time);
+
+	private:
+	BezierCurve bezier_curve;
 };
 
 class Trajectory {
