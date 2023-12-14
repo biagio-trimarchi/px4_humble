@@ -63,9 +63,8 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 
 		// Debug
 		double debug_time;
-		CircleSegment trajectory_debug_1;
-		CircleSegment trajectory_debug_2;
-		CircleSegment trajectory_debug_3;
+		SpiralSegment trajectory_debug_1;
+		SpiralSegment trajectory_debug_2;
 
 		// ROS2 VARIABLES
 		// Timers

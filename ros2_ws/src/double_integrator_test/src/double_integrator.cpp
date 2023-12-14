@@ -33,11 +33,11 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 
 	// Debug
 	debug_time = 0.0;
-	std::vector<float> control_points = {0.0, 0.0, 0.0, M_PI, M_PI, 2.0*M_PI, 2.0*M_PI, 2.0*M_PI};
+	std::vector<float> control_points = {0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0, 1.0};
 	auto param_test = std::make_shared<BezierParameterization>(7, control_points, 2.0 * M_PI); 
 	Eigen::Vector3d center(0.0, 0.0, 0.0);
-	trajectory_debug_1 = CircleSegment(2.0 * M_PI, 2.0, center, 1.0);  
-	trajectory_debug_2 = CircleSegment(2.0 * M_PI, 2.0, center, 1.0);  
+	trajectory_debug_1 = SpiralSegment(2.0 * M_PI, 3.0, 2.0, center, 1.0, true);  
+	trajectory_debug_2 = SpiralSegment(2.0 * M_PI, 3.0, 2.0, center, 1.0, false);  
 	trajectory_debug_2.set_parameterization(param_test);
 
 	// QoS

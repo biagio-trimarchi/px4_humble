@@ -76,7 +76,7 @@ CircleSegment::CircleSegment() {}
 
 CircleSegment::CircleSegment(double _duration, 
                              double _radius,
-														 Eigen::Vector3d &_center,
+                             Eigen::Vector3d &_center,
                              double _angular_velocity) : TrajectorySegment(_duration) {
 	radius = _radius;
 	center = _center;
@@ -86,7 +86,7 @@ CircleSegment::CircleSegment(double _duration,
 
 CircleSegment::CircleSegment(double _duration, 
                              double _radius,
-														 Eigen::Vector3d &_center,
+                             Eigen::Vector3d &_center,
                              double _angular_velocity,
                              Eigen::Matrix3d &_orientation) : TrajectorySegment(_duration) {
 	radius = _radius;
@@ -99,7 +99,7 @@ CircleSegment::~CircleSegment() {}
 
 Eigen::Vector3d CircleSegment::get_position(double time) {
 	Eigen::Vector3d result = Eigen::Vector3d::Zero();
-	double s = time;
+	double s = time / duration;
 
 	if (time < 0 || time > duration) {
 		std::cerr << "[Trajectory Segment] (get_position) : 'time' out of bound" << std::endl;
@@ -110,15 +110,15 @@ Eigen::Vector3d CircleSegment::get_position(double time) {
 		s = parameterization->evaluate_function(time);
 	}
 
-	result.x() = center.x() + radius * cos(angular_velocity * s);	
-	result.y() = center.y() + radius * sin(angular_velocity * s);	
+	result.x() = center.x() + radius * cos(angular_velocity * duration * s);	
+	result.y() = center.y() + radius * sin(angular_velocity * duration * s);	
 	return orientation * result;
 }
 
 Eigen::Vector3d CircleSegment::get_velocity(double time) {
 	Eigen::Vector3d result = Eigen::Vector3d::Zero();
-	double s = time;
-	double ds = 1.0;
+	double s = time / duration;
+	double ds = 1.0 / duration;
 
 	if (time < 0 || time > duration) {
 		std::cerr << "[Trajectory Segment] (get_velocity) : 'time' out of bound" << std::endl;
@@ -130,17 +130,17 @@ Eigen::Vector3d CircleSegment::get_velocity(double time) {
 		ds = parameterization->evaluate_first_derivative(time);
 	}
 	
-	result.x() = - ds * angular_velocity * radius * sin(angular_velocity * s);
-	result.y() =   ds * angular_velocity * radius * cos(angular_velocity * s);
+	result.x() = - ds * angular_velocity * duration * radius * sin(angular_velocity * duration * s);
+	result.y() =   ds * angular_velocity * duration * radius * cos(angular_velocity * duration * s);
 
 	return orientation * result;
 }
 
 Eigen::Vector3d CircleSegment::get_acceleration(double time) {
 	Eigen::Vector3d result = Eigen::Vector3d::Zero();
-	double s = time;
-	double ds = 1.0;
-	double dds = 1.0;
+	double s = time / duration;
+	double ds = 1.0 / duration;
+	double dds = 0.0;
 
 	if (time < 0 || time > duration) {
 		std::cerr << "[Trajectory Segment] (get_acceleration) : 'time' out of bound" << std::endl;
@@ -153,10 +153,109 @@ Eigen::Vector3d CircleSegment::get_acceleration(double time) {
 		dds = parameterization->evaluate_second_derivative(time);
 	}
 	
-	result.x() = - pow(ds * angular_velocity, 2.0) * radius * cos(angular_velocity * s) - 
-	                        dds * angular_velocity * radius * sin(angular_velocity * s);
-	result.y() = - pow(ds * angular_velocity, 2.0) * radius * sin(angular_velocity * s) + 
-		                      dds * angular_velocity * radius * cos(angular_velocity * s);
+	result.x() = - pow(ds * angular_velocity * duration, 2.0) * radius * cos(angular_velocity * duration * s) - 
+	                        dds * angular_velocity * duration * radius * sin(angular_velocity * duration * s);
+	result.y() = - pow(ds * angular_velocity * duration, 2.0) * radius * sin(angular_velocity * duration * s) + 
+		                      dds * angular_velocity * duration * radius * cos(angular_velocity * duration * s);
+
+	return orientation * result;
+}
+
+// Spiral Segment
+SpiralSegment::SpiralSegment() {};
+
+SpiralSegment::SpiralSegment(double _duration,
+                             double _height,
+                             double _radius,
+                             Eigen::Vector3d &_center,
+                             double _angular_velocity,
+                             bool _is_direction_down) : TrajectorySegment(_duration) {
+	height = _height;
+	radius = _radius;
+	center = _center;
+	angular_velocity = _angular_velocity;
+	is_direction_down = _is_direction_down;
+	orientation = Eigen::Matrix3d::Identity();
+}
+
+SpiralSegment::SpiralSegment(double _duration,
+                             double _height,
+                             double _radius,
+                             Eigen::Vector3d &_center,
+                             double _angular_velocity,
+                             bool _is_direction_down,
+                             Eigen::Matrix3d &_orientation) : TrajectorySegment(_duration) {
+	height = _height;
+	radius = _radius;
+	center = _center;
+	angular_velocity = _angular_velocity;
+	is_direction_down = _is_direction_down;
+	orientation = _orientation;
+}
+
+Eigen::Vector3d SpiralSegment::get_position(double time) {
+	Eigen::Vector3d result = Eigen::Vector3d::Zero();
+	double s = time / duration;
+
+	if (time < 0 || time > duration) {
+		std::cerr << "[Trajectory Segment] (get_position) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	if (is_time_parameterized) {
+		s = parameterization->evaluate_function(time);
+	}
+
+	result.x() = center.x() + radius * cos(angular_velocity * duration * s);	
+	result.y() = center.y() + radius * sin(angular_velocity * duration * s);	
+	result.z() = center.z() + height * s * (is_direction_down?-1.0:1.0);
+	return orientation * result;
+}
+
+Eigen::Vector3d SpiralSegment::get_velocity(double time) {
+	Eigen::Vector3d result = Eigen::Vector3d::Zero();
+	double s = time / duration;
+	double ds = 1.0 / duration;
+
+	if (time < 0 || time > duration) {
+		std::cerr << "[Trajectory Segment] (get_velocity) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	if (is_time_parameterized) {
+		s = parameterization->evaluate_function(time);
+		ds = parameterization->evaluate_first_derivative(time);
+	}
+	
+	result.x() = - ds * angular_velocity * duration * radius * sin(angular_velocity * duration * s);
+	result.y() =   ds * angular_velocity * duration * radius * cos(angular_velocity * duration * s);
+	result.z() =   height * ds * (is_direction_down?-1.0:1.0);
+
+	return orientation * result;
+}
+
+Eigen::Vector3d SpiralSegment::get_acceleration(double time) {
+	Eigen::Vector3d result = Eigen::Vector3d::Zero();
+	double s = time / duration;
+	double ds = 1.0 / duration;
+	double dds = 0.0;
+
+	if (time < 0 || time > duration) {
+		std::cerr << "[Trajectory Segment] (get_acceleration) : 'time' out of bound" << std::endl;
+		return result;
+	}
+
+	if (is_time_parameterized) {
+		s = parameterization->evaluate_function(time);
+		ds = parameterization->evaluate_first_derivative(time);
+		dds = parameterization->evaluate_second_derivative(time);
+	}
+	
+	result.x() = - pow(ds * angular_velocity * duration, 2.0) * radius * cos(angular_velocity * duration * s) - 
+	                        dds * angular_velocity * duration * radius * sin(angular_velocity * duration * s);
+	result.y() = - pow(ds * angular_velocity * duration, 2.0) * radius * sin(angular_velocity * duration * s) + 
+		                      dds * angular_velocity * duration * radius * cos(angular_velocity * duration * s);
+	result.z() =   height * dds * (is_direction_down?-1.0:1.0);
 
 	return orientation * result;
 }

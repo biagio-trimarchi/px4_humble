@@ -13,6 +13,8 @@
 #include <double_integrator_test/bezier_utilities.hpp>
 
 class Parameterization {
+	// This class implement a parameterization s(t) from the interval [0, T]
+	// to the interval [0, 1]
 	public:
 		// Constructors/Destructor
 		Parameterization();
@@ -73,7 +75,7 @@ class CircleSegment : public TrajectorySegment {
                   double _radius,
                   Eigen::Vector3d &_center,
                   double _angular_velocity,
-									Eigen::Matrix3d &_orientation);
+                  Eigen::Matrix3d &_orientation);
 		~CircleSegment();
 
 		// Functions
@@ -85,6 +87,38 @@ class CircleSegment : public TrajectorySegment {
 		double radius;
 		Eigen::Vector3d center;
 		double angular_velocity;
+		Eigen::Matrix3d orientation;
+};
+
+class SpiralSegment : public TrajectorySegment {
+	public:
+		// Constructors/destructor
+		SpiralSegment();
+		SpiralSegment(double _duration,
+                  double _height,
+                  double _radius,
+                  Eigen::Vector3d &_center,
+                  double _angular_velocity,
+                  bool _is_direction_down);
+		SpiralSegment(double _duration,
+                  double _height,
+                  double _radius,
+                  Eigen::Vector3d &_center,
+                  double _angular_velocity,
+                  bool _is_direction_down,
+                  Eigen::Matrix3d &_orientation);
+
+		// Functions
+		Eigen::Vector3d get_position(double time);
+		Eigen::Vector3d get_velocity(double time);
+		Eigen::Vector3d get_acceleration(double time);
+
+	private:
+		double radius;
+		double height;
+		Eigen::Vector3d center;
+		double angular_velocity;
+		bool is_direction_down;
 		Eigen::Matrix3d orientation;
 };
 
