@@ -1,2 +1,3 @@
 # Ignore swp file (vim)
 *.swp
+*.swo
