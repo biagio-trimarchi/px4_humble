@@ -33,24 +33,100 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 
 	// Debug
 	debug_time = 0.0;
-	std::vector<float> control_points_param = {0.0, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0, 1.0};
-	auto param_test = std::make_shared<BezierParameterization>(7, control_points_param, 10.0); 
-	Eigen::Vector3d center(0.0, 0.0, 0.0);
+	std::shared_ptr<BezierSegment> p_segment_takeoff;
+	std::shared_ptr<BezierSegment> p_segment_1;
+	std::shared_ptr<CircleSegment> p_segment_2;
+	std::shared_ptr<SpiralSegment> p_segment_3;
+	std::shared_ptr<BezierSegment> p_segment_4;
+	std::shared_ptr<BezierSegment> p_segment_land;
 
-	std::vector<Eigen::Vector3d> control_points = std::vector<Eigen::Vector3d>(8);
-	control_points[0] = Eigen::Vector3d(0.0, 0.0, 0.0);
-	control_points[1] = Eigen::Vector3d(1.0, 0.0, 0.0);
-	control_points[2] = Eigen::Vector3d(2.0, 1.0, 1.0);
-	control_points[3] = Eigen::Vector3d(1.0, 2.0, 2.0);
-	control_points[4] = Eigen::Vector3d(0.0, 2.0, -2.0);
-	control_points[5] = Eigen::Vector3d(-1.0, 2.0, -2.0);
-	control_points[6] = Eigen::Vector3d(-1.0, 3.0, 1.0);
-	control_points[7] = Eigen::Vector3d(0.0, 3.0, 0.0);
+	double time_takeoff = 2.0;
+	double time_segment_1 = 5.0;
+	double time_segment_2 = 10.0;
+	double time_segment_3 = 10.0;
+	double time_segment_4 = 5.0;
+	double time_land = 5.0;
+	total_time = time_takeoff + time_segment_1 + time_segment_2 + time_segment_3 + time_segment_4 + time_land;
 
-	trajectory_debug_1 = BezierSegment(10.0, 7, control_points);  
-	trajectory_debug_2 = BezierSegment(10.0, 7, control_points);  
-	trajectory_debug_2.set_parameterization(param_test);
+	// Takeoff
+	auto control_points_takeoff = std::vector<Eigen::Vector3d>(8);
+	control_points_takeoff[0] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_takeoff[1] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_takeoff[2] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_takeoff[3] = Eigen::Vector3d(0.0, 0.0, 0.5);
+	control_points_takeoff[4] = Eigen::Vector3d(0.0, 0.0, 0.5);
+	control_points_takeoff[5] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_takeoff[6] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_takeoff[7] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	p_segment_takeoff = std::make_shared<BezierSegment>(time_takeoff, 7, control_points_takeoff);
+	
+	trajectory_debug.append_segment(p_segment_takeoff);
 
+	// Segment 1
+	auto control_points_segment_1 = std::vector<Eigen::Vector3d>(8);
+	control_points_segment_1[0] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_1[1] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_1[2] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_1[3] = Eigen::Vector3d(2.5, 1.0, 1.5);
+	control_points_segment_1[4] = Eigen::Vector3d(2.5, 1.0, 1.5);
+	control_points_segment_1[5] = Eigen::Vector3d(5.0, 0.0, 1.0);
+	control_points_segment_1[6] = Eigen::Vector3d(5.0, 0.0, 1.0);
+	control_points_segment_1[7] = Eigen::Vector3d(5.0, 0.0, 1.0);
+	p_segment_1 = std::make_shared<BezierSegment>(time_segment_1, 7, control_points_segment_1);
+	
+	trajectory_debug.append_segment(p_segment_1);
+	
+	// Segment 2
+	Eigen::Vector3d center = Eigen::Vector3d(0.0, 0.0, 1.0);
+	double radius = 5.0;
+	p_segment_2 = std::make_shared<CircleSegment>(time_segment_2, radius, center, 2.0 * M_PI / time_segment_2); 
+	auto control_points_parameterization = std::vector<double>(8);
+	control_points_parameterization[0] = 0.0;
+	control_points_parameterization[1] = 0.0;
+	control_points_parameterization[2] = 0.0;
+	control_points_parameterization[3] = 0.3;
+	control_points_parameterization[4] = 0.7;
+	control_points_parameterization[5] = 1.0;
+	control_points_parameterization[6] = 1.0;
+	control_points_parameterization[7] = 1.0;
+	auto circle_parameterization = std::make_shared<BezierParameterization>(7, control_points_parameterization, time_segment_2);
+	p_segment_2->set_parameterization(circle_parameterization);
+
+	trajectory_debug.append_segment(p_segment_2);
+
+	// Segment 3
+	p_segment_3 = std::make_shared<SpiralSegment>(time_segment_3, 1.0, radius, center, 2.0 * M_PI / time_segment_3, false);
+	
+	trajectory_debug.append_segment(p_segment_3);
+
+	// Segment 4
+	auto control_points_segment_4 = std::vector<Eigen::Vector3d>(8);
+	control_points_segment_4[0] = Eigen::Vector3d(5.0, 0.0, 2.0);
+	control_points_segment_4[1] = Eigen::Vector3d(5.0, 0.0, 2.0);
+	control_points_segment_4[2] = Eigen::Vector3d(5.0, 0.0, 2.0);
+	control_points_segment_4[3] = Eigen::Vector3d(2.5, 0.0, 1.5);
+	control_points_segment_4[4] = Eigen::Vector3d(2.5, 0.0, 1.5);
+	control_points_segment_4[5] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_4[6] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_4[7] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	p_segment_4 = std::make_shared<BezierSegment>(time_segment_4, 7, control_points_segment_4);
+	
+	trajectory_debug.append_segment(p_segment_4);
+	
+	// Segment land
+	auto control_points_land = std::vector<Eigen::Vector3d>(8);
+	control_points_land[0] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_land[1] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_land[2] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_land[3] = Eigen::Vector3d(0.0, 0.0, 0.5);
+	control_points_land[4] = Eigen::Vector3d(0.0, 0.0, 0.5);
+	control_points_land[5] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_land[6] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_land[7] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	p_segment_land = std::make_shared<BezierSegment>(time_land, 7, control_points_land);
+	
+	trajectory_debug.append_segment(p_segment_land);
+	
 	// QoS
 	rmw_qos_profile_t qos_profile_sensor_data = rmw_qos_profile_sensor_data;
 	rclcpp::QoS qos_sensor_data = rclcpp::QoS(
@@ -125,117 +201,63 @@ void DoubleIntegratorGovernor::debugCallback() {
 
 	// Prepare messages
  	debug_time += double(dynamics_timer_frequency_ms) * 0.001;
-	if (debug_time > 10.0) debug_time = 0.0;
-	Eigen::Vector3d marker_position_1 = trajectory_debug_1.get_position(debug_time);
-	Eigen::Vector3d marker_position_2 = trajectory_debug_2.get_position(debug_time);
+	if (debug_time > total_time) debug_time = 0.0;
+	Eigen::Vector3d marker_position = trajectory_debug.evaluate_position(debug_time);
 
 	// Prepare trajectory
-	visualization_msgs::msg::Marker trajectory_markers1;
-	trajectory_markers1.header.stamp = this->get_clock()->now();
-	trajectory_markers1.header.frame_id = "map";
-	trajectory_markers1.id = 0;
-	trajectory_markers1.type = visualization_msgs::msg::Marker::POINTS;
-	trajectory_markers1.action = visualization_msgs::msg::Marker::ADD;
-	trajectory_markers1.pose.position.x = 0.0;
-	trajectory_markers1.pose.position.y = 0.0;
-	trajectory_markers1.pose.position.z = 0.0;
-	trajectory_markers1.pose.orientation.w = 1.0;
-	trajectory_markers1.pose.orientation.x = 0.0;
-	trajectory_markers1.pose.orientation.y = 0.0;
-	trajectory_markers1.pose.orientation.z = 0.0;
-	trajectory_markers1.scale.x = 0.1;
-	trajectory_markers1.scale.y = 0.1;
-	trajectory_markers1.scale.z = 0.0;
-	trajectory_markers1.color.a = 1.0;
-	trajectory_markers1.color.r = 0.0;
-	trajectory_markers1.color.g = 0.0;
-	trajectory_markers1.color.b = 0.0;
-	trajectory_markers1.points = std::vector<geometry_msgs::msg::Point>(30);
-	for (double i = 0; i < 30; i++){
-		Eigen::Vector3d point = trajectory_debug_1.get_position(10.0 / 30.0 * i);;
-		trajectory_markers1.points[i].x = point.x();
-		trajectory_markers1.points[i].y = point.y();
-		trajectory_markers1.points[i].z = point.z();
-	}
-
-	// Prepare trajectory
-	visualization_msgs::msg::Marker trajectory_markers2;
-	trajectory_markers2.header.stamp = this->get_clock()->now();
-	trajectory_markers2.header.frame_id = "map";
-	trajectory_markers2.id = 1;
-	trajectory_markers2.type = visualization_msgs::msg::Marker::POINTS;
-	trajectory_markers2.action = visualization_msgs::msg::Marker::ADD;
-	trajectory_markers2.pose.position.x = 0.0;
-	trajectory_markers2.pose.position.y = 0.0;
-	trajectory_markers2.pose.position.z = 0.0;
-	trajectory_markers2.pose.orientation.w = 1.0;
-	trajectory_markers2.pose.orientation.x = 0.0;
-	trajectory_markers2.pose.orientation.y = 0.0;
-	trajectory_markers2.pose.orientation.z = 0.0;
-	trajectory_markers2.scale.x = 0.1;
-	trajectory_markers2.scale.y = 0.1;
-	trajectory_markers2.scale.z = 0.0;
-	trajectory_markers2.color.a = 1.0;
-	trajectory_markers2.color.r = 0.0;
-	trajectory_markers2.color.g = 0.0;
-	trajectory_markers2.color.b = 0.0;
-	trajectory_markers2.points = std::vector<geometry_msgs::msg::Point>(30);
-	for (double i = 0; i < 30; i++){
-		Eigen::Vector3d point = trajectory_debug_2.get_position(10.0 / 30.0 * i);;
-		trajectory_markers2.points[i].x = point.x();
-		trajectory_markers2.points[i].y = point.y();
-		trajectory_markers2.points[i].z = point.z();
+	visualization_msgs::msg::Marker trajectory_markers;
+	trajectory_markers.header.stamp = this->get_clock()->now();
+	trajectory_markers.header.frame_id = "map";
+	trajectory_markers.id = 0;
+	trajectory_markers.type = visualization_msgs::msg::Marker::POINTS;
+	trajectory_markers.action = visualization_msgs::msg::Marker::ADD;
+	trajectory_markers.pose.position.x = 0.0;
+	trajectory_markers.pose.position.y = 0.0;
+	trajectory_markers.pose.position.z = 0.0;
+	trajectory_markers.pose.orientation.w = 1.0;
+	trajectory_markers.pose.orientation.x = 0.0;
+	trajectory_markers.pose.orientation.y = 0.0;
+	trajectory_markers.pose.orientation.z = 0.0;
+	trajectory_markers.scale.x = 0.1;
+	trajectory_markers.scale.y = 0.1;
+	trajectory_markers.scale.z = 0.0;
+	trajectory_markers.color.a = 1.0;
+	trajectory_markers.color.r = 0.0;
+	trajectory_markers.color.g = 0.0;
+	trajectory_markers.color.b = 0.0;
+	trajectory_markers.points = std::vector<geometry_msgs::msg::Point>(1000);
+	for (double i = 0; i < 1000; i++){
+		Eigen::Vector3d point = trajectory_debug.evaluate_position(total_time / 1000.0 * i);;
+		trajectory_markers.points[i].x = point.x();
+		trajectory_markers.points[i].y = point.y();
+		trajectory_markers.points[i].z = point.z();
 	}
 
 	// Prepare setpoint
-	visualization_msgs::msg::Marker setpoint_marker1;
-	setpoint_marker1.header.stamp = this->get_clock()->now();
-	setpoint_marker1.header.frame_id = "map";
-	setpoint_marker1.id = 3;
-	setpoint_marker1.type = visualization_msgs::msg::Marker::SPHERE;
-	setpoint_marker1.action = visualization_msgs::msg::Marker::ADD;
-	setpoint_marker1.pose.position.x = marker_position_1.x();
-	setpoint_marker1.pose.position.y = marker_position_1.y();
-	setpoint_marker1.pose.position.z = marker_position_1.z();
-	setpoint_marker1.pose.orientation.w = 1.0;
-	setpoint_marker1.pose.orientation.x = 0.0;
-	setpoint_marker1.pose.orientation.y = 0.0;
-	setpoint_marker1.pose.orientation.z = 0.0;
-	setpoint_marker1.scale.x = 1.0;
-	setpoint_marker1.scale.y = 1.0;
-	setpoint_marker1.scale.z = 1.0;
-	setpoint_marker1.color.a = 0.5;
-	setpoint_marker1.color.r = 1.0;
-	setpoint_marker1.color.g = 0.0;
-	setpoint_marker1.color.b = 0.0;
-
-	// Prepare setpoint
-	visualization_msgs::msg::Marker setpoint_marker2;
-	setpoint_marker2.header.stamp = this->get_clock()->now();
-	setpoint_marker2.header.frame_id = "map";
-	trajectory_markers1.id = 4;
-	setpoint_marker2.type = visualization_msgs::msg::Marker::SPHERE;
-	setpoint_marker2.action = visualization_msgs::msg::Marker::ADD;
-	setpoint_marker2.pose.position.x = marker_position_2.x();
-	setpoint_marker2.pose.position.y = marker_position_2.y();
-	setpoint_marker2.pose.position.z = marker_position_2.z();
-	setpoint_marker2.pose.orientation.w = 1.0;
-	setpoint_marker2.pose.orientation.x = 0.0;
-	setpoint_marker2.pose.orientation.y = 0.0;
-	setpoint_marker2.pose.orientation.z = 0.0;
-	setpoint_marker2.scale.x = 0.5;
-	setpoint_marker2.scale.y = 0.5;
-	setpoint_marker2.scale.z = 0.5;
-	setpoint_marker2.color.a = 1.0;
-	setpoint_marker2.color.r = 0.0;
-	setpoint_marker2.color.g = 1.0;
-	setpoint_marker2.color.b = 0.0;
+	visualization_msgs::msg::Marker setpoint_marker;
+	setpoint_marker.header.stamp = this->get_clock()->now();
+	setpoint_marker.header.frame_id = "map";
+	setpoint_marker.id = 3;
+	setpoint_marker.type = visualization_msgs::msg::Marker::SPHERE;
+	setpoint_marker.action = visualization_msgs::msg::Marker::ADD;
+	setpoint_marker.pose.position.x = marker_position.x();
+	setpoint_marker.pose.position.y = marker_position.y();
+	setpoint_marker.pose.position.z = marker_position.z();
+	setpoint_marker.pose.orientation.w = 1.0;
+	setpoint_marker.pose.orientation.x = 0.0;
+	setpoint_marker.pose.orientation.y = 0.0;
+	setpoint_marker.pose.orientation.z = 0.0;
+	setpoint_marker.scale.x = 0.5;
+	setpoint_marker.scale.y = 0.5;
+	setpoint_marker.scale.z = 0.5;
+	setpoint_marker.color.a = 0.5;
+	setpoint_marker.color.r = 1.0;
+	setpoint_marker.color.g = 0.0;
+	setpoint_marker.color.b = 1.0;
 
 	// Send messages
-	trajectory_visualizer_publisher->publish(trajectory_markers1);
-	trajectory_visualizer_publisher->publish(trajectory_markers2);
-	setpoint_visualizer_publisher->publish(setpoint_marker1);
-	setpoint_visualizer_publisher->publish(setpoint_marker2);
+	trajectory_visualizer_publisher->publish(trajectory_markers);
+	setpoint_visualizer_publisher->publish(setpoint_marker);
 }
 
 void DoubleIntegratorGovernor::stateMachine() {

@@ -31,7 +31,7 @@ class BezierParameterization : public Parameterization {
 	public:
 		// Constructors/Destructor
 		BezierParameterization();
-		BezierParameterization(unsigned int order, const std::vector<float> control_points, double duration);
+		BezierParameterization(unsigned int order, const std::vector<double> &control_points, double duration);
 		~BezierParameterization();
 
 		// Functions
@@ -50,9 +50,9 @@ class TrajectorySegment {
 		~TrajectorySegment();
 
 		// Functions
-		Eigen::Vector3d get_position(double time);
-		Eigen::Vector3d get_velocity(double time);
-		Eigen::Vector3d get_acceleration(double time);
+		virtual Eigen::Vector3d get_position(double time);
+		virtual Eigen::Vector3d get_velocity(double time);
+		virtual Eigen::Vector3d get_acceleration(double time);
 		void set_parameterization(const std::shared_ptr<Parameterization>& new_param);
 		void unset_parameterization();
 		double get_duration();
@@ -146,15 +146,18 @@ class Trajectory {
 	public:
 		Trajectory();
 		~Trajectory();
-	private:
+	
 		// Functions
-		Eigen::Vector3d evaluate_position(double actual_time);
-		Eigen::Vector3d evaluate_velocity(double actual_time);
-		Eigen::Vector3d evaluate_acceleration(double actual_time);
-		void add_new_segment();
+		Eigen::Vector3d evaluate_position(double time);
+		Eigen::Vector3d evaluate_velocity(double time);
+		Eigen::Vector3d evaluate_acceleration(double time);
+		void add_segment(const std::shared_ptr<TrajectorySegment> &segment, unsigned int index);
+		void append_segment(const std::shared_ptr<TrajectorySegment> &segment);
+		void delete_segment(unsigned int index);
 		void delete_trajectory();
 
+	private:
 		// Variables
 		double start_time;
-		std::vector<std::unique_ptr<TrajectorySegment*>> segments;
+		std::vector<std::shared_ptr<TrajectorySegment>> segments;
 };

@@ -24,7 +24,7 @@ double Parameterization::evaluate_second_derivative(double time) {
 // Bezier curve parameterization
 BezierParameterization::BezierParameterization() {}
 
-BezierParameterization::BezierParameterization(unsigned int order, const std::vector<double> &control_points, double duration) : Parameterization() {
+BezierParameterization::BezierParameterization(unsigned int order, const std::vector<float> &control_points, double duration) : Parameterization() {
 	if (control_points.size() != order+1) {
 		std::cerr << "[ERROR] (BezierParameterization constructor) : 'order' do not match the size of 'control_points'" << std::endl;;
 	}
@@ -118,7 +118,7 @@ Eigen::Vector3d CircleSegment::get_position(double time) {
 	double s = time / duration;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Circle Segment] (get_position) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_position) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -128,7 +128,6 @@ Eigen::Vector3d CircleSegment::get_position(double time) {
 
 	result.x() = center.x() + radius * cos(angular_velocity * duration * s);	
 	result.y() = center.y() + radius * sin(angular_velocity * duration * s);	
-	result.z() = center.z();
 	return orientation * result;
 }
 
@@ -138,7 +137,7 @@ Eigen::Vector3d CircleSegment::get_velocity(double time) {
 	double ds = 1.0 / duration;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Circle Segment] (get_velocity) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_velocity) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -160,7 +159,7 @@ Eigen::Vector3d CircleSegment::get_acceleration(double time) {
 	double dds = 0.0;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Circle Segment] (get_acceleration) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_acceleration) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -217,7 +216,7 @@ Eigen::Vector3d SpiralSegment::get_position(double time) {
 	double s = time / duration;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Spiral Segment] (get_position) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_position) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -237,7 +236,7 @@ Eigen::Vector3d SpiralSegment::get_velocity(double time) {
 	double ds = 1.0 / duration;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Spiral Segment] (get_velocity) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_velocity) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -260,7 +259,7 @@ Eigen::Vector3d SpiralSegment::get_acceleration(double time) {
 	double dds = 0.0;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Spiral Segment] (get_acceleration) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_acceleration) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -307,7 +306,7 @@ Eigen::Vector3d BezierSegment::get_position(double time) {
 	double s = time / duration;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Bezier Segment] (get_position) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_position) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -325,7 +324,7 @@ Eigen::Vector3d BezierSegment::get_velocity(double time) {
 	double ds = 1.0 / duration;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Bezier Segment] (get_velocity) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_velocity) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -345,7 +344,7 @@ Eigen::Vector3d BezierSegment::get_acceleration(double time) {
 	double dds = 0.0;
 
 	if (time < 0.0 || time > duration) {
-		std::cerr << "[Bezier Segment] (get_acceleration) : 'time' out of bound" << std::endl;
+		std::cerr << "[Trajectory Segment] (get_acceleration) : 'time' out of bound" << std::endl;
 		return result;
 	}
 
@@ -367,10 +366,9 @@ Trajectory::~Trajectory() {}
 Eigen::Vector3d Trajectory::evaluate_position(double time) {
 	Eigen::Vector3d result;
 
-	unsigned int segment_index = 0;	
-	double cumulated_segments_time = segments[segment_index]->get_duration();
-	for (; segment_index < segments.size() && cumulated_segments_time < time;) {
-		segment_index++;
+	double cumulated_segments_time = 0;
+	unsigned int segment_index;	
+	for (segment_index = 0; segment_index < segments.size() && cumulated_segments_time < time; segment_index++) {
 		cumulated_segments_time += segments[segment_index]->get_duration();
 	}
 	if (cumulated_segments_time < time) {
@@ -378,7 +376,6 @@ Eigen::Vector3d Trajectory::evaluate_position(double time) {
 		return result;
 	}
 
-	cumulated_segments_time -= segments[segment_index]->get_duration();
 	result = segments[segment_index]->get_position(time - cumulated_segments_time);
 
 	return result;	
@@ -387,10 +384,9 @@ Eigen::Vector3d Trajectory::evaluate_position(double time) {
 Eigen::Vector3d Trajectory::evaluate_velocity(double time) {
 	Eigen::Vector3d result;
 
-	unsigned int segment_index = 0;	
-	double cumulated_segments_time = segments[segment_index]->get_duration();
-	for (; segment_index < segments.size() && cumulated_segments_time < time;) {
-		segment_index++;
+	double cumulated_segments_time = 0;
+	unsigned int segment_index;	
+	for (segment_index = 0; segment_index < segments.size() && cumulated_segments_time < time; segment_index++) {
 		cumulated_segments_time += segments[segment_index]->get_duration();
 	}
 	if (cumulated_segments_time < time) {
@@ -398,7 +394,6 @@ Eigen::Vector3d Trajectory::evaluate_velocity(double time) {
 		return result;
 	}
 
-	cumulated_segments_time -= segments[segment_index]->get_duration();
 	result = segments[segment_index]->get_velocity(time - cumulated_segments_time);
 
 	return result;	
@@ -407,10 +402,9 @@ Eigen::Vector3d Trajectory::evaluate_velocity(double time) {
 Eigen::Vector3d Trajectory::evaluate_acceleration(double time) {
 	Eigen::Vector3d result;
 
-	unsigned int segment_index = 0;	
-	double cumulated_segments_time = segments[segment_index]->get_duration();
-	for (; segment_index < segments.size() && cumulated_segments_time < time;) {
-		segment_index++;
+	double cumulated_segments_time = 0;
+	unsigned int segment_index;	
+	for (segment_index = 0; segment_index < segments.size() && cumulated_segments_time < time; segment_index++) {
 		cumulated_segments_time += segments[segment_index]->get_duration();
 	}
 	if (cumulated_segments_time < time) {
@@ -418,24 +412,23 @@ Eigen::Vector3d Trajectory::evaluate_acceleration(double time) {
 		return result;
 	}
 
-	cumulated_segments_time -= segments[segment_index]->get_duration();
 	result = segments[segment_index]->get_acceleration(time - cumulated_segments_time);
 
 	return result;	
 }
 
-void Trajectory::add_segment(const std::shared_ptr<TrajectorySegment> &segment, unsigned int index) {
+void Trajectory::add_segment(std::unique_ptr<TrajectorySegment> &segment, unsigned int index) {
 	if (index > segments.size()) {
 		std::cerr << "[Trajectory] (add_segment) : 'index' out of bound, segment not inserted " << std::endl;
 		return;
 	}
 
 	auto iterator = segments.begin() + index;
-	segments.insert(iterator, segment);
+	segments.emplace(iterator, std::move(segment));
 }
 
-void Trajectory::append_segment(const std::shared_ptr<TrajectorySegment> &segment) {
-	segments.push_back(segment);
+void Trajectory::append_segment(const std::unique_ptr<TrajectorySegment> &segment) {
+	segments.emplace_back(std::move(segment));
 }
 
 
