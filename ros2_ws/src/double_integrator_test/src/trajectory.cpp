@@ -355,7 +355,7 @@ Eigen::Vector3d BezierSegment::get_acceleration(double time) {
 		dds = parameterization->evaluate_second_derivative(time);
 	}
 
-	result = dds * duration *  bezier_curve.evaluate_derivative(duration * s, 1);
+	result = dds * duration *  bezier_curve.evaluate_derivative(duration * s, 2);
 	return result;
 }
 

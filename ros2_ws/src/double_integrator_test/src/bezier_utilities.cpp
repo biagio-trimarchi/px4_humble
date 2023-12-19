@@ -61,7 +61,6 @@ Eigen::VectorXd BezierCurve::evaluate_derivative(double time, int derivative_ord
 	Eigen::MatrixXd derivative_control_points = control_points;
 	derivative_control_points = derivative_control_points * derivation_matrix;
 	int number_derivative_control_points = static_cast<int>(derivative_control_points.cols());
-	std::cout << "Derivative control points start" << std::endl << derivative_control_points << std::endl;
 
 	// Evaluate using De Casteljau
 	for (int j=1; j < number_derivative_control_points; j++) {
@@ -92,8 +91,8 @@ Eigen::MatrixXd BezierCurve::compute_derivation_matrix(int derivative_order) {
 	for (int i=1; i<=derivative_order; i++) {
 		Eigen::MatrixXd single_derivation_matrix = Eigen::MatrixXd::Zero(order+2-i , order+1-i);
 		for (int j=0; j < order+1-i; j++) {
-			single_derivation_matrix(j, j) = -1.0 / duration;
-			single_derivation_matrix(j+1, j) = 1.0 / duration;
+			single_derivation_matrix(j, j) = -1.0 / duration * double(order - i + 1);
+			single_derivation_matrix(j+1, j) = 1.0 / duration * double(order - i + 1);
 		}
 		result =  result * single_derivation_matrix;
 	}

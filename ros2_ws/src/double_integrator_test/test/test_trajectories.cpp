@@ -26,7 +26,6 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 
 	dynamics_timer_frequency_ms = 50;
 	state_machine_timer_frequency_ms = 100;
-	
 
 	agent_state = INIT;
 	transition_takeoff = false;
@@ -34,24 +33,99 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 
 	// Debug
 	debug_time = 0.0;
-	euler_integration_step = 0.001;
-	omega = 1.0;
-	total_time = 2 * M_PI;
-	radius = 1.0;
-	height = 2.0;
-	Eigen::Vector3d center = Eigen::Vector3d::Zero();
+	std::shared_ptr<BezierSegment> p_segment_takeoff;
+	std::shared_ptr<BezierSegment> p_segment_1;
+	std::shared_ptr<CircleSegment> p_segment_2;
+	std::shared_ptr<SpiralSegment> p_segment_3;
+	std::shared_ptr<BezierSegment> p_segment_4;
+	std::shared_ptr<BezierSegment> p_segment_land;
 
-	position_debug = Eigen::Vector3d::Zero();
-	position_debug.x() = radius;
-	velocity_debug = Eigen::Vector3d::Zero();
-	acceleration_debug = Eigen::Vector3d::Zero();
+	double time_takeoff = 0.2;
+	double time_segment_1 = 0.5;
+	double time_segment_2 = 1.0;
+	double time_segment_3 = 1.0;
+	double time_segment_4 = 0.5;
+	double time_land = 0.5;
+	total_time = time_takeoff + time_segment_1 + time_segment_2 + time_segment_3 + time_segment_4 + time_land;
 
-	trajectory_debug = SpiralSegment(total_time, height, radius, center, omega, false);	
-	std::vector<double> ctrl_points = {0.0, 0.5, 0.5, 1.0};
-	auto param = std::make_shared<BezierParameterization>(3, ctrl_points, total_time);
-	trajectory_debug.set_parameterization(param);
+	// Takeoff
+	auto control_points_takeoff = std::vector<Eigen::Vector3d>(8);
+	control_points_takeoff[0] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_takeoff[1] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_takeoff[2] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_takeoff[3] = Eigen::Vector3d(0.0, 0.0, 0.5);
+	control_points_takeoff[4] = Eigen::Vector3d(0.0, 0.0, 0.5);
+	control_points_takeoff[5] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_takeoff[6] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_takeoff[7] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	p_segment_takeoff = std::make_shared<BezierSegment>(time_takeoff, 7, control_points_takeoff);
+	
+	trajectory_debug.append_segment(p_segment_takeoff);
 
-	velocity_debug = trajectory_debug.get_velocity(0.0);
+	// Segment 1
+	auto control_points_segment_1 = std::vector<Eigen::Vector3d>(8);
+	control_points_segment_1[0] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_1[1] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_1[2] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_1[3] = Eigen::Vector3d(2.5, 1.0, 1.5);
+	control_points_segment_1[4] = Eigen::Vector3d(2.5, 1.0, 1.5);
+	control_points_segment_1[5] = Eigen::Vector3d(5.0, 0.0, 1.0);
+	control_points_segment_1[6] = Eigen::Vector3d(5.0, 0.0, 1.0);
+	control_points_segment_1[7] = Eigen::Vector3d(5.0, 0.0, 1.0);
+	p_segment_1 = std::make_shared<BezierSegment>(time_segment_1, 7, control_points_segment_1);
+	
+	trajectory_debug.append_segment(p_segment_1);
+	
+	// Segment 2
+	Eigen::Vector3d center = Eigen::Vector3d(0.0, 0.0, 1.0);
+	double radius = 5.0;
+	p_segment_2 = std::make_shared<CircleSegment>(time_segment_2, radius, center, 2.0 * M_PI / time_segment_2); 
+	auto control_points_parameterization = std::vector<double>(8);
+	control_points_parameterization[0] = 0.0;
+	control_points_parameterization[1] = 0.0;
+	control_points_parameterization[2] = 0.0;
+	control_points_parameterization[3] = 0.3;
+	control_points_parameterization[4] = 0.7;
+	control_points_parameterization[5] = 1.0;
+	control_points_parameterization[6] = 1.0;
+	control_points_parameterization[7] = 1.0;
+	auto circle_parameterization = std::make_shared<BezierParameterization>(7, control_points_parameterization, time_segment_2);
+	p_segment_2->set_parameterization(circle_parameterization);
+
+	trajectory_debug.append_segment(p_segment_2);
+
+	// Segment 3
+	p_segment_3 = std::make_shared<SpiralSegment>(time_segment_3, 1.0, radius, center, 2.0 * M_PI / time_segment_3, false);
+	
+	trajectory_debug.append_segment(p_segment_3);
+
+	// Segment 4
+	auto control_points_segment_4 = std::vector<Eigen::Vector3d>(8);
+	control_points_segment_4[0] = Eigen::Vector3d(5.0, 0.0, 2.0);
+	control_points_segment_4[1] = Eigen::Vector3d(5.0, 0.0, 2.0);
+	control_points_segment_4[2] = Eigen::Vector3d(5.0, 0.0, 2.0);
+	control_points_segment_4[3] = Eigen::Vector3d(2.5, 0.0, 1.5);
+	control_points_segment_4[4] = Eigen::Vector3d(2.5, 0.0, 1.5);
+	control_points_segment_4[5] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_4[6] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_segment_4[7] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	p_segment_4 = std::make_shared<BezierSegment>(time_segment_4, 7, control_points_segment_4);
+	
+	trajectory_debug.append_segment(p_segment_4);
+	
+	// Segment land
+	auto control_points_land = std::vector<Eigen::Vector3d>(8);
+	control_points_land[0] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_land[1] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_land[2] = Eigen::Vector3d(0.0, 0.0, 1.0);
+	control_points_land[3] = Eigen::Vector3d(0.0, 0.0, 0.5);
+	control_points_land[4] = Eigen::Vector3d(0.0, 0.0, 0.5);
+	control_points_land[5] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_land[6] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	control_points_land[7] = Eigen::Vector3d(0.0, 0.0, 0.0);
+	p_segment_land = std::make_shared<BezierSegment>(time_land, 7, control_points_land);
+	
+	trajectory_debug.append_segment(p_segment_land);
 	
 	// QoS
 	rmw_qos_profile_t qos_profile_sensor_data = rmw_qos_profile_sensor_data;
@@ -125,25 +199,10 @@ void DoubleIntegratorGovernor::debugCallback() {
 
 	tf2_broadcaster->sendTransform(t_map_to_odom);
 
-	// Simulate integrator
-	for (int i = 0; i < dynamics_timer_frequency_ms; i++) {
-		float tmp = debug_time + double(i) * euler_integration_step;
-		if (tmp > total_time) {
-			tmp = 0;
-			position_debug = trajectory_debug.get_position(0.0);
-			velocity_debug = trajectory_debug.get_velocity(0.0);
-			break;
-		}
-		acceleration_debug = trajectory_debug.get_acceleration(tmp);
-		velocity_debug += acceleration_debug * euler_integration_step;
-		position_debug += velocity_debug * euler_integration_step;
-	}
-
 	// Prepare messages
  	debug_time += double(dynamics_timer_frequency_ms) * 0.001;
 	if (debug_time > total_time) debug_time = 0.0;
-	Eigen::Vector3d marker_position = trajectory_debug.get_position(debug_time);
-
+	Eigen::Vector3d marker_position = trajectory_debug.evaluate_position(debug_time);
 
 	// Prepare trajectory
 	visualization_msgs::msg::Marker trajectory_markers;
@@ -168,13 +227,13 @@ void DoubleIntegratorGovernor::debugCallback() {
 	trajectory_markers.color.b = 0.0;
 	trajectory_markers.points = std::vector<geometry_msgs::msg::Point>(1000);
 	for (double i = 0; i < 1000; i++){
-		Eigen::Vector3d point = trajectory_debug.get_position(total_time / 1000.0 * i);;
+		Eigen::Vector3d point = trajectory_debug.evaluate_position(total_time / 1000.0 * i);;
 		trajectory_markers.points[i].x = point.x();
 		trajectory_markers.points[i].y = point.y();
 		trajectory_markers.points[i].z = point.z();
 	}
 
-	// Prepare setpoint 1
+	// Prepare setpoint
 	visualization_msgs::msg::Marker setpoint_marker;
 	setpoint_marker.header.stamp = this->get_clock()->now();
 	setpoint_marker.header.frame_id = "map";
@@ -196,32 +255,9 @@ void DoubleIntegratorGovernor::debugCallback() {
 	setpoint_marker.color.g = 0.0;
 	setpoint_marker.color.b = 1.0;
 
-	// Prepare setpoint 2
-	visualization_msgs::msg::Marker setpoint_marker_2;
-	setpoint_marker_2.header.stamp = this->get_clock()->now();
-	setpoint_marker_2.header.frame_id = "map";
-	setpoint_marker_2.id = 4;
-	setpoint_marker_2.type = visualization_msgs::msg::Marker::SPHERE;
-	setpoint_marker_2.action = visualization_msgs::msg::Marker::ADD;
-	setpoint_marker_2.pose.position.x = position_debug.x();
-	setpoint_marker_2.pose.position.y = position_debug.y();
-	setpoint_marker_2.pose.position.z = position_debug.z();
-	setpoint_marker_2.pose.orientation.w = 1.0;
-	setpoint_marker_2.pose.orientation.x = 0.0;
-	setpoint_marker_2.pose.orientation.y = 0.0;
-	setpoint_marker_2.pose.orientation.z = 0.0;
-	setpoint_marker_2.scale.x = 0.3;
-	setpoint_marker_2.scale.y = 0.3;
-	setpoint_marker_2.scale.z = 0.3;
-	setpoint_marker_2.color.a = 0.3;
-	setpoint_marker_2.color.r = 0.0;
-	setpoint_marker_2.color.g = 1.0;
-	setpoint_marker_2.color.b = 0.0;
-
 	// Send messages
 	trajectory_visualizer_publisher->publish(trajectory_markers);
 	setpoint_visualizer_publisher->publish(setpoint_marker);
-	setpoint_visualizer_publisher->publish(setpoint_marker_2);
 }
 
 void DoubleIntegratorGovernor::stateMachine() {
