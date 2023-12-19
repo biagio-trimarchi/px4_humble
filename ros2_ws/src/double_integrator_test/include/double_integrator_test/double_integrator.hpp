@@ -63,7 +63,7 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 
 		// Debug
 		double debug_time;
-		BezierSegment trajectory_debug;
+		Trajectory trajectory_debug;
 		double total_time;
 		Eigen::Vector3d position_debug;
 		Eigen::Vector3d velocity_debug;

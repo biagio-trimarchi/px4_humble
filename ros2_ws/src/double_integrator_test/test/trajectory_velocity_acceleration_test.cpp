@@ -47,12 +47,12 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	std::shared_ptr<BezierSegment> p_segment_4;
 	std::shared_ptr<BezierSegment> p_segment_land;
 
-	double time_takeoff = 0.2;
-	double time_segment_1 = 0.5;
-	double time_segment_2 = 1.0;
-	double time_segment_3 = 1.0;
-	double time_segment_4 = 0.5;
-	double time_land = 0.5;
+	double time_takeoff = 1.0;
+	double time_segment_1 = 2.0;
+	double time_segment_2 = 2.0;
+	double time_segment_3 = 2.0;
+	double time_segment_4 = 4.0;
+	double time_land = 2.0;
 	total_time = time_takeoff + time_segment_1 + time_segment_2 + time_segment_3 + time_segment_4 + time_land;
 
 	// Takeoff
@@ -209,6 +209,10 @@ void DoubleIntegratorGovernor::debugCallback() {
 	// Simulate integrator
 	for (int i = 0; i < dynamics_timer_frequency_ms; i++) {
 		float tmp = debug_time + double(i) * euler_integration_step;
+		if (tmp > total_time) {
+			tmp = 0;
+			break;
+		}
 		velocity_debug = trajectory_debug.evaluate_velocity(tmp);
 		position_debug += velocity_debug * euler_integration_step;
 	}
