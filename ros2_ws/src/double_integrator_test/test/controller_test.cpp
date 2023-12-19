@@ -11,18 +11,21 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	// Set Parameters
 
 	// VARIABLES
+	reference_position = Eigen::Vector3d(0.0, 0.0, 0.0);
+	reference_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
+	reference_acceleration = Eigen::Vector3d(0.0, 0.0, 0.0);
+
 	drone_position = Eigen::Vector3d(0.0, 0.0, 0.0);
-	drone_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
 
 	takeoff_altitude = 1.0;
 	PD_position_gain = 2.5;
-	PD_velocity_gain = 3.5;
+	PD_velocity_gain = 0.5;
 	setpoint_position = Eigen::Vector3d(0.0, 0.0, 0.0);
 	setpoint_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
 	setpoint_acceleration = Eigen::Vector3d(0.0, 0.0, 0.0);
 	trajectory_time = 0.0;
 
-	dynamics_timer_frequency_ms = 10;
+	dynamics_timer_frequency_ms = 50;
 	state_machine_timer_frequency_ms = 100;
 
 	agent_state = INIT;
@@ -276,12 +279,12 @@ void DoubleIntegratorGovernor::actionCallback(const std_msgs::msg::Empty msg) {
 void DoubleIntegratorGovernor::odometryCallback(const px4_msgs::msg::VehicleOdometry::SharedPtr msg) {
 	// Read odometry and update agent position and acceleration
 	drone_position.x() = msg->position[0];
-	drone_position.y() = -msg->position[1];
-	drone_position.z() = -msg->position[2];
+	drone_position.y() = msg->position[1];
+	drone_position.z() = msg->position[2];
 
-	drone_velocity.x() = msg->velocity[0];
-	drone_velocity.y() = -msg->velocity[1];
-	drone_velocity.z() = -msg->velocity[2];
+	// agent_velocity.x() = msg.velocity[0];
+	// agent_velocity.y() = msg.velocity[1];
+	// agent_velocity.z() = msg.velocity[2];
 }
 
 void DoubleIntegratorGovernor::px4StatusCallback(const px4_msgs::msg::VehicleControlMode::SharedPtr msg) {
@@ -299,9 +302,12 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	}
 
 	// Compute acceleration
-	setpoint_acceleration = - PD_position_gain * ( drone_position - setpoint_position) 
-		                       - PD_velocity_gain * ( drone_velocity - setpoint_velocity)
+	reference_acceleration = - PD_position_gain * ( reference_position - setpoint_position) 
+		                       - PD_velocity_gain * ( reference_velocity - setpoint_velocity)
 													 + setpoint_acceleration;
+
+	reference_position += reference_velocity * double(dynamics_timer_frequency_ms) * 0.001;
+	reference_velocity += reference_acceleration * double(dynamics_timer_frequency_ms) * 0.001;
 	
 	// Load and publish Offboard and Setpoint messages
 	px4_msgs::msg::OffboardControlMode offboard_msg;
@@ -311,21 +317,19 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	setpoint_msg.timestamp = this->get_clock()->now().nanoseconds() / 1000;
 
 	// I should try also the acceleration only control
-	offboard_msg.position = false;
-	offboard_msg.velocity = false;
-	offboard_msg.acceleration = true;
+	offboard_msg.position = true;
 
-	setpoint_msg.position[0] = std::numeric_limits<double>::quiet_NaN();
-	setpoint_msg.position[1] = std::numeric_limits<double>::quiet_NaN();
-	setpoint_msg.position[2] = std::numeric_limits<double>::quiet_NaN();
+	setpoint_msg.position[0] = reference_position.x();
+	setpoint_msg.position[1] = reference_position.y();
+	setpoint_msg.position[2] = -reference_position.z();
 
-	setpoint_msg.velocity[0] = std::numeric_limits<double>::quiet_NaN();
-	setpoint_msg.velocity[1] = std::numeric_limits<double>::quiet_NaN();
-	setpoint_msg.velocity[2] = std::numeric_limits<double>::quiet_NaN();
+	setpoint_msg.velocity[0] = reference_velocity.x();
+	setpoint_msg.velocity[1] = reference_velocity.y();
+	setpoint_msg.velocity[2] = -reference_velocity.z();
 
-	setpoint_msg.acceleration[0] = setpoint_acceleration.x();
-	setpoint_msg.acceleration[1] = -setpoint_acceleration.y();
-	setpoint_msg.acceleration[2] = -setpoint_acceleration.z();
+	setpoint_msg.acceleration[0] = reference_acceleration.x();
+	setpoint_msg.acceleration[1] = reference_acceleration.y();
+	setpoint_msg.acceleration[2] = -reference_acceleration.z();
 
 	offboard_publisher->publish(offboard_msg);
 	setpoint_publisher->publish(setpoint_msg);
