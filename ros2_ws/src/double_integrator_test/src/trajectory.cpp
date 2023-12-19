@@ -341,7 +341,7 @@ Eigen::Vector3d BezierSegment::get_velocity(double time) {
 Eigen::Vector3d BezierSegment::get_acceleration(double time) {
 	Eigen::Vector3d result = Eigen::Vector3d::Zero();
 	double s = time / duration;
-	// double ds = 1.0 / duration;
+	double ds = 1.0 / duration;
 	double dds = 0.0;
 
 	if (time < 0.0 || time > duration) {
@@ -351,11 +351,11 @@ Eigen::Vector3d BezierSegment::get_acceleration(double time) {
 
 	if (is_time_parameterized) {
 		s = parameterization->evaluate_function(time);
-		// ds = parameterization->evaluate_first_derivative(time);
-		dds = parameterization->evaluate_second_derivative(time);
+		s = parameterization->evaluate_first_derivative(time);
+		ds = parameterization->evaluate_second_derivative(time);
 	}
 
-	result = dds * duration *  bezier_curve.evaluate_derivative(duration * s, 2);
+	result = dds * duration * bezier_curve.evaluate_derivative(duration * s, 1) + pow(ds * duration, 2.0) *  bezier_curve.evaluate_derivative(duration * s, 2);
 	return result;
 }
 

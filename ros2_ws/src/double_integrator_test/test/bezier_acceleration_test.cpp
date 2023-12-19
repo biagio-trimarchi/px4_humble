@@ -139,9 +139,9 @@ void DoubleIntegratorGovernor::debugCallback() {
 			velocity_debug = trajectory_debug.get_velocity(0.0);
 			break;
 		}
-		acceleration_debug = trajectory_debug.get_acceleration(tmp);
-		velocity_debug += acceleration_debug * euler_integration_step;
-		// velocity_debug = trajectory_debug.get_velocity(tmp);
+		// acceleration_debug = trajectory_debug.get_acceleration(tmp);
+		// velocity_debug += acceleration_debug * euler_integration_step;
+		velocity_debug = trajectory_debug.get_velocity(tmp);
 		position_debug += velocity_debug * euler_integration_step;
 	}
 
