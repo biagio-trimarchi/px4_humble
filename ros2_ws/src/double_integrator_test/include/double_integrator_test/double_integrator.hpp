@@ -26,6 +26,7 @@
 // Custom Libraries
 #include <double_integrator_test/bezier_utilities.hpp>
 #include <double_integrator_test/trajectory.hpp>
+#include <double_integrator_test/logGPIS.hpp>
 
 // CLASSES
 class DoubleIntegratorGovernor : public rclcpp::Node {
