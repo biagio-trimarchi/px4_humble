@@ -1,5 +1,5 @@
 // LIBRARIES
-#include <double_integrator/logGPIS.hpp>
+#include <double_integrator_test/logGPIS.hpp>
 
 // CLASSES
 // LogGPIS
@@ -30,15 +30,15 @@ double LogGPIS::evaluate(Eigen::Vector3d x) {
 
 Eigen::RowVector3d LogGPIS::gradient(Eigen::Vector3d x) {
 	double d = evaluate(x);
-	Eigen::Vector3d grad = gaussian_process.gradient_posterior_mean(x);
+	Eigen::RowVector3d grad = gaussian_process.gradient_posterior_mean(x);
 
-	return - grad / (lambda_whittle * d);
+	return -grad / (lambda_whittle * d);
 }
 
 Eigen::Matrix3d LogGPIS::hessian(Eigen::Vector3d x) {
 	double d = evaluate(x);
-	Eigen::Vector3d grad = gaussian_process.gradient_posterior_mean(x);
+	Eigen::RowVector3d grad = gaussian_process.gradient_posterior_mean(x);
 	Eigen::Matrix3d hess = gaussian_process.hessian_posterior_mean(x);
-
-	return grad.transpose() * grad / (lambda_whittle * d * d) - hess / (lambda_whittle * d)
+	
+	return grad.transpose() * grad / (lambda_whittle * d * d) - hess / (lambda_whittle * d);
 }

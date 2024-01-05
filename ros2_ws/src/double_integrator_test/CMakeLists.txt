@@ -26,7 +26,13 @@ ament_target_dependencies(governor_node
 	rclcpp px4_msgs Eigen3 std_msgs visualization_msgs geometry_msgs tf2 tf2_ros
 )
 
+add_executable(visualization_test src/sphere_and_cylinder_test.cpp src/logGPIS.cpp src/gp_matern32.cpp)
+ament_target_dependencies(visualization_test 
+	rclcpp Eigen3 visualization_msgs geometry_msgs
+)
+
 install( TARGETS governor_node DESTINATION lib/${PROJECT_NAME})
+install( TARGETS visualization_test DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

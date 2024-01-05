@@ -27,18 +27,18 @@ class GaussianProcessMatern32 {
 	private:
 		// Functions
 		bool check_collected(Eigen::Vector3d x);
-		double kernel(Eigen::Vector3d &x_1, Eigen::Vector3d &x_2);
-		Eigen::RowVector3d gradient_kernel(Eigen::Vector3d &x_1, Eigen::Vector3d &x_2);
-		Eigen::Matrix3d hessian_kernel(Eigen::Vector3d &x_1, Eigen::Vector3d &x_2);
+		double kernel(Eigen::Vector3d x_1, Eigen::Vector3d x_2);
+		Eigen::RowVector3d gradient_kernel(Eigen::Vector3d x_1, Eigen::Vector3d x_2);
+		Eigen::Matrix3d hessian_kernel(Eigen::Vector3d x_1, Eigen::Vector3d x_2);
 
 		// Variables
 		double error_variance;
-		double lenght_scale;
+		double length_scale;
 		double resolution;
 		unsigned int number_of_samples;
 
-		Eigen::Matrix3Xd data_input;
-		Eigen::VectorXd data_output;
+		Eigen::Matrix3Xd data_x;
+		Eigen::VectorXd data_y;
 		Eigen::MatrixXd K;
-		Eigen::MatrixXd alpha;
+		Eigen::VectorXd alpha;
 };
