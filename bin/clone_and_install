@@ -1,0 +1,10 @@
+#!/bin/bash
+
+LINK=$1
+FOLDER_NAME=$2
+git clone $LINK $FOLDER_NAME
+cd $FOLDER_NAME
+mkdir build
+cd build
+cmake ..
+make && sudo make install

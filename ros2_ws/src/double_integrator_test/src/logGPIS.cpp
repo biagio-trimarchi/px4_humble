@@ -38,7 +38,9 @@ Eigen::RowVector3d LogGPIS::gradient(Eigen::Vector3d x) {
 Eigen::Matrix3d LogGPIS::hessian(Eigen::Vector3d x) {
 	double d = evaluate(x);
 	Eigen::RowVector3d grad = gaussian_process.gradient_posterior_mean(x);
-	Eigen::Matrix3d hess = gaussian_process.hessian_posterior_mean(x);
+  Eigen::Matrix3d hess = gaussian_process.hessian_posterior_mean(x);
 	
-	return grad.transpose() * grad / (lambda_whittle * d * d) - hess / (lambda_whittle * d);
+	Eigen::Matrix3d a = grad.transpose() * grad / (lambda_whittle * d * d);
+	Eigen::Matrix3d b = hess / (lambda_whittle * d);
+	return a;
 }

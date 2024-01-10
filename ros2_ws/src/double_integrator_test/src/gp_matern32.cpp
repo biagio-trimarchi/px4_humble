@@ -78,7 +78,7 @@ Eigen::RowVector3d GaussianProcessMatern32::gradient_posterior_mean(Eigen::Vecto
 }
 
 Eigen::Matrix3d GaussianProcessMatern32::hessian_posterior_mean(Eigen::Vector3d x) {
-	Eigen::MatrixXd auxiliary_sum = Eigen::MatrixXd::Zero(number_of_samples, number_of_samples);
+	Eigen::Matrix3d auxiliary_sum = Eigen::Matrix3d::Zero();
 	
 	x /= length_scale;
 	for (unsigned int i = 0; i < number_of_samples; i++)
@@ -149,5 +149,5 @@ Eigen::Matrix3d GaussianProcessMatern32::hessian_kernel(Eigen::Vector3d x_1,
 
 	return (-3.0 * Eigen::Matrix3d::Identity() + 
 	         3.0 * std::sqrt(3.0) * ((x_1 - x_2) *  (x_1 - x_2).transpose()) / r ) * 
-	       std::exp(-std::sqrt(3.0) * r);
+	         std::exp(-std::sqrt(3.0) * r);
 }

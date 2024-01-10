@@ -14,14 +14,40 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	drone_position = Eigen::Vector3d(0.0, 0.0, 0.0);
 	drone_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
 
+	PD_position_gain = 5.5;
+	PD_velocity_gain = 2.3;
+
+	qpOASES_constraints_number = 1;
+	qpOASES_solver = qpOASES::QProblem(3, qpOASES_constraints_number);
+	qpOASES_options.printLevel = qpOASES::PL_NONE;
+	qpOASES_solver.setOptions(qpOASES_options);
+	qpOASES_H = Eigen::Matrix3d::Identity();
+	qpOASES_A = Eigen::MatrixXd::Zero(qpOASES_constraints_number, 3);
+	qpOASES_lbA = Eigen::VectorXd::Zero(qpOASES_constraints_number);
+	qpOASES_ubA = 10.0 * Eigen::VectorXd::Ones(qpOASES_constraints_number);
+	qpOASES_lb << -10.0, -10.0, -10.0;
+	qpOASES_ub << 10.0, 10.0, 10.0;
+
+	gp_lambda_whittle = 5.0;
+	gp_resolution = 0.2;
+	gp_error_variance = 0.01;
+	log_gpis = LogGPIS(gp_lambda_whittle, gp_resolution, gp_error_variance);
+	is_log_gpis_trained = false;
+	bf_classK_gain_1 = 2.0;
+	bf_classK_gain_1 = 0.5;
+	bf_gain_lie_0_kh = bf_classK_gain_1 * bf_classK_gain_2;
+	bf_gain_lie_1_kh = bf_classK_gain_1 + bf_classK_gain_2;
+	bf_safe_margin = 0.1;
+
+	addGroundSphereCylinder();
+
 	takeoff_altitude = 1.0;
-	PD_position_gain = 3.0;
-	PD_velocity_gain = 1.0;
 	setpoint_position = Eigen::Vector3d(0.0, 0.0, 0.0);
 	setpoint_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
 	setpoint_acceleration = Eigen::Vector3d(0.0, 0.0, 0.0);
 	trajectory_time = 0.0;
 
+	debug_timer_frequency_ms = 10;
 	dynamics_timer_frequency_ms = 10;
 	state_machine_timer_frequency_ms = 100;
 
@@ -62,22 +88,22 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	trajectory.append_segment(p_segment_takeoff);
 
 	// Segment 1
+	double radius = 3.0;
 	auto control_points_segment_1 = std::vector<Eigen::Vector3d>(8);
 	control_points_segment_1[0] = Eigen::Vector3d(0.0, 0.0, 1.0);
 	control_points_segment_1[1] = Eigen::Vector3d(0.0, 0.0, 1.0);
 	control_points_segment_1[2] = Eigen::Vector3d(0.0, 0.0, 1.0);
-	control_points_segment_1[3] = Eigen::Vector3d(2.5, 1.0, 1.5);
-	control_points_segment_1[4] = Eigen::Vector3d(2.5, 1.0, 1.5);
-	control_points_segment_1[5] = Eigen::Vector3d(5.0, 0.0, 1.0);
-	control_points_segment_1[6] = Eigen::Vector3d(5.0, 0.0, 1.0);
-	control_points_segment_1[7] = Eigen::Vector3d(5.0, 0.0, 1.0);
+	control_points_segment_1[3] = Eigen::Vector3d(radius/2.0, 1.0, 1.5);
+	control_points_segment_1[4] = Eigen::Vector3d(radius/2.0, 1.0, 1.5);
+	control_points_segment_1[5] = Eigen::Vector3d(radius, 0.0, 1.0);
+	control_points_segment_1[6] = Eigen::Vector3d(radius, 0.0, 1.0);
+	control_points_segment_1[7] = Eigen::Vector3d(radius, 0.0, 1.0);
 	p_segment_1 = std::make_shared<BezierSegment>(time_segment_1, 7, control_points_segment_1);
 	
 	trajectory.append_segment(p_segment_1);
 	
 	// Segment 2
 	Eigen::Vector3d center = Eigen::Vector3d(0.0, 0.0, 1.0);
-	double radius = 5.0;
 	p_segment_2 = std::make_shared<CircleSegment>(time_segment_2, radius, center, 2.0 * M_PI / time_segment_2); 
 	auto control_points_parameterization = std::vector<double>(8);
 	control_points_parameterization[0] = 0.0;
@@ -99,14 +125,13 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	
 	trajectory.append_segment(p_segment_3);
 	
-
 	// Segment 4
 	auto control_points_segment_4 = std::vector<Eigen::Vector3d>(8);
-	control_points_segment_4[0] = Eigen::Vector3d(5.0, 0.0, 2.0);
-	control_points_segment_4[1] = Eigen::Vector3d(5.0, 0.0, 2.0);
-	control_points_segment_4[2] = Eigen::Vector3d(5.0, 0.0, 2.0);
-	control_points_segment_4[3] = Eigen::Vector3d(2.5, 0.0, 1.5);
-	control_points_segment_4[4] = Eigen::Vector3d(2.5, 0.0, 1.5);
+	control_points_segment_4[0] = Eigen::Vector3d(radius, 0.0, 2.0);
+	control_points_segment_4[1] = Eigen::Vector3d(radius, 0.0, 2.0);
+	control_points_segment_4[2] = Eigen::Vector3d(radius, 0.0, 2.0);
+	control_points_segment_4[3] = Eigen::Vector3d(radius/2.0, 0.0, 1.5);
+	control_points_segment_4[4] = Eigen::Vector3d(radius/2.0, 0.0, 1.5);
 	control_points_segment_4[5] = Eigen::Vector3d(0.0, 0.0, 1.0);
 	control_points_segment_4[6] = Eigen::Vector3d(0.0, 0.0, 1.0);
 	control_points_segment_4[7] = Eigen::Vector3d(0.0, 0.0, 1.0);
@@ -141,6 +166,11 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	qos_reliable_transientLocal.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
 
 	// TIMERS
+	debug_timer = this->create_wall_timer(
+				std::chrono::milliseconds(debug_timer_frequency_ms),
+				std::bind(&DoubleIntegratorGovernor::debugCallback, this)
+			);
+
 	dynamics_timer = this->create_wall_timer(
 				std::chrono::milliseconds(dynamics_timer_frequency_ms),
 				std::bind(&DoubleIntegratorGovernor::dynamicsCallback, this)
@@ -181,7 +211,7 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 			);
 
 	setpoint_visualizer_publisher = this->create_publisher<visualization_msgs::msg::Marker>(
-				"/setpoint_marker", qos_sensor_data
+				"/setpoint_marker", 10
 			);
 
 	vehicle_command_publisher = this->create_publisher<px4_msgs::msg::VehicleCommand>(
@@ -193,6 +223,29 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 }
 
 DoubleIntegratorGovernor::~DoubleIntegratorGovernor() {}
+
+void DoubleIntegratorGovernor::debugCallback() {
+	visualization_msgs::msg::Marker msg;
+	msg.header.frame_id = "map";
+	msg.header.stamp = this->get_clock()->now();
+	msg.type = visualization_msgs::msg::Marker::SPHERE;
+	msg.action = visualization_msgs::msg::Marker::ADD;
+	msg.pose.position.x = drone_position.x();
+	msg.pose.position.y = drone_position.y();
+	msg.pose.position.z = drone_position.z();
+	msg.pose.orientation.w = 1.0;
+	msg.pose.orientation.x = 0.0;
+	msg.pose.orientation.y = 0.0;
+	msg.pose.orientation.z = 0.0;
+	msg.scale.x = 0.3;
+	msg.scale.y = 0.3;
+	msg.scale.z = 0.3;
+	msg.color.r = 1.0;
+	msg.color.g = 0.0;
+	msg.color.b = 0.0;
+	msg.color.a = 1.0;
+	setpoint_visualizer_publisher->publish(msg);
+}
 
 void DoubleIntegratorGovernor::publishPX4Command(uint16_t command, float param1 = 0.0, float param2 = 0.0) {
 	px4_msgs::msg::VehicleCommand msg;
@@ -289,12 +342,61 @@ void DoubleIntegratorGovernor::px4StatusCallback(const px4_msgs::msg::VehicleCon
 	is_drone_offboard = msg->flag_control_offboard_enabled;
 }
 
+void DoubleIntegratorGovernor::controlBarrierFunction() {
+	if (!is_log_gpis_trained)
+		return;
+	
+	// Compute barrier functions needed derivatives
+	double h = log_gpis.evaluate(drone_position) - bf_safe_margin;;
+	Eigen::RowVector<double, 6> gradient_h;
+	Eigen::Matrix<double, 6, 6> hessian_h;
+
+	gradient_h.setZero();
+	gradient_h.block(0, 0,  1, 3) = log_gpis.gradient(drone_position); 
+
+	hessian_h.setZero();
+	hessian_h.block(0, 0, 3, 3) = log_gpis.hessian(drone_position);
+
+	// Compute lie derivatives
+	Eigen::Vector<double, 6> integrator_state;
+	Eigen::Matrix<double, 6, 6> integrator_dynamic_A;
+	Eigen::Matrix<double, 6, 3> integrator_dynamic_B;
+
+	integrator_state.block(0,0,3,1) = drone_position;
+	integrator_state.block(3,0,3,1) = drone_velocity;
+
+	integrator_dynamic_A.setZero();
+	integrator_dynamic_A.block(0,3,3,3) = Eigen::Matrix3d::Identity();
+
+	integrator_dynamic_B.setZero();
+	integrator_dynamic_B.block(3,0,3,3) = Eigen::Matrix3d::Identity();
+
+	double lie_f_h = gradient_h * integrator_dynamic_A * integrator_state;
+	double lie_f2_h_1 = integrator_state.transpose() * integrator_dynamic_A.transpose() * hessian_h * integrator_dynamic_A * integrator_state; 
+	double lie_f2_h_2 = gradient_h * integrator_dynamic_A * integrator_dynamic_A * integrator_state;
+	double lie_f2_h = lie_f2_h_1 + lie_f2_h_2;
+
+	Eigen::RowVector3d lie_gf_h = integrator_state.transpose() * integrator_dynamic_A.transpose() * hessian_h * integrator_dynamic_B +
+	                           gradient_h * integrator_dynamic_A * integrator_dynamic_B;
+
+	qpOASES_nWSR = 10;
+	qpOASES_g = -setpoint_acceleration;
+	qpOASES_A.block(0, 0, 1, 3) = lie_gf_h;
+	qpOASES_lbA(0) = - lie_f2_h - bf_gain_lie_1_kh * lie_f_h - bf_gain_lie_0_kh * h;
+
+	qpOASES_solver.init(qpOASES_H.data(), qpOASES_g.data(),  qpOASES_A.data(),
+	                    qpOASES_lb.data(), qpOASES_ub.data(), qpOASES_lbA.data(),
+	                    qpOASES_ubA.data(), qpOASES_nWSR);
+
+	qpOASES_solver.getPrimalSolution(setpoint_acceleration.data());
+}
+
 void DoubleIntegratorGovernor::dynamicsCallback() {
 	setpoint_acceleration = Eigen::Vector3d(0.0, 0.0, 0.0);
 	if (follow_trajectory) {
 		setpoint_position = trajectory.evaluate_position(trajectory_time);
 		setpoint_velocity = trajectory.evaluate_velocity(trajectory_time);
-		setpoint_acceleration = trajectory.evaluate_acceleration(trajectory_time);
+		setpoint_acceleration = trajectory.evaluate_acceleration(trajectory_time); 
 		trajectory_time += double(dynamics_timer_frequency_ms) * 0.001;
 		if (trajectory_time > total_time) trajectory_time = total_time;
 	}
@@ -302,6 +404,7 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	// Compute acceleration
 	setpoint_acceleration += - PD_position_gain * ( drone_position - setpoint_position) 
 		                        - PD_velocity_gain * ( drone_velocity - setpoint_velocity); 
+	controlBarrierFunction();
 	
 	// Load and publish Offboard and Setpoint messages
 	px4_msgs::msg::OffboardControlMode offboard_msg;
@@ -337,6 +440,47 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 
 	offboard_publisher->publish(offboard_msg);
 	setpoint_publisher->publish(setpoint_msg);
+}
+
+void DoubleIntegratorGovernor::addGroundSphereCylinder() {
+		// Add ground
+		for (double x = -5.0; x < 5.1; x += 0.5) {
+			for (double y = -5.0; y < 5.1; y += 0.5) {
+				Eigen::Vector3d point(x, y, -0.5);
+				log_gpis.add_sample(point);
+			}
+		}
+
+		// Add Sphere
+		Eigen::Vector3d sphere_center(2.0, 2.0, 3.0);
+		double sphere_radius = 0.3;
+		for (double psi = 0.0; psi < M_PI+0.1; psi += 0.2){
+			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
+				Eigen::Vector3d point(sin(psi) * cos(theta),
+				                      sin(psi) * sin(theta),
+				                      cos(psi)
+				                     );
+				point = sphere_center + sphere_radius * point;
+				log_gpis.add_sample(point);
+			}
+		}
+
+		Eigen::Vector3d cylinder_center_ground(-1.0, -3.0, 0.0);
+		double cylinder_radius = 0.5;
+		for (double z = 0.0; z < 2.1; z += 0.2){
+			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
+				Eigen::Vector3d point(cylinder_radius * cos(theta), 
+				                      cylinder_radius * sin(theta), 
+				                      z);
+				point = cylinder_center_ground + cylinder_radius * point;
+				log_gpis.add_sample(point);
+			}
+		}
+
+		RCLCPP_INFO(this->get_logger(), "Training...");
+		log_gpis.train();
+		is_log_gpis_trained = true;
+		RCLCPP_INFO(this->get_logger(), "Done!");
 }
 
 // MAIN

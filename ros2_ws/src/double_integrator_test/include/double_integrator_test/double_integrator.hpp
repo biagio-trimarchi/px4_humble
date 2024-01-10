@@ -22,6 +22,7 @@
 
 // Third Party Libraries
 #include <Eigen/Eigen>
+#include <qpOASES.hpp>
 
 // Custom Libraries
 #include <double_integrator_test/bezier_utilities.hpp>
@@ -45,15 +46,45 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		void actionCallback(const std_msgs::msg::Empty msg);
 		void odometryCallback(const px4_msgs::msg::VehicleOdometry::SharedPtr msg);
 		void px4StatusCallback(const px4_msgs::msg::VehicleControlMode::SharedPtr msg);
+		void controlBarrierFunction();
 		void dynamicsCallback();
+		void addGroundSphereCylinder();
 
 		// VARIABLES
 		Eigen::Vector3d drone_position;
 		Eigen::Vector3d drone_velocity;
 
-		double takeoff_altitude;
+		// PD gains
 		double PD_position_gain;
 		double PD_velocity_gain;
+
+		// Barrier functions variables
+		// (I think I may get rid of most of the matrices)
+		qpOASES::QProblem qpOASES_solver;
+		qpOASES::Options qpOASES_options;
+		Eigen::Matrix3d qpOASES_H;
+		Eigen::Vector3d qpOASES_g;
+		Eigen::MatrixXd qpOASES_A;
+		Eigen::VectorXd qpOASES_lbA;
+		Eigen::VectorXd qpOASES_ubA;
+		Eigen::Vector3d qpOASES_lb;
+		Eigen::Vector3d qpOASES_ub;
+		int qpOASES_constraints_number;
+		int qpOASES_nWSR;
+
+		LogGPIS log_gpis;
+		double gp_lambda_whittle;
+		double gp_resolution;
+		double gp_error_variance;
+		bool is_log_gpis_trained;
+		double bf_classK_gain_1;
+		double bf_classK_gain_2;
+		double bf_gain_lie_0_kh;
+		double bf_gain_lie_1_kh;
+		double bf_safe_margin;
+
+		// Trajectory parameters
+		double takeoff_altitude;
 		Eigen::Vector3d setpoint_position;
 		Eigen::Vector3d setpoint_velocity;
 		Eigen::Vector3d setpoint_acceleration;
@@ -61,6 +92,7 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		double trajectory_time;
 		double total_time;
 		
+		int debug_timer_frequency_ms;
 		int dynamics_timer_frequency_ms;
 		int state_machine_timer_frequency_ms;
 
@@ -75,6 +107,7 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 
 		// ROS2 VARIABLES
 		// Timers
+		rclcpp::TimerBase::SharedPtr debug_timer;
 		rclcpp::TimerBase::SharedPtr dynamics_timer;
 		rclcpp::TimerBase::SharedPtr state_machine_timer;
 

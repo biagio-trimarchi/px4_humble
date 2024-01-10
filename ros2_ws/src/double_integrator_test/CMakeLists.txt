@@ -19,12 +19,14 @@ find_package(tf2_ros REQUIRED)
 include_directories(
 	${PROJECT_SOURCE_DIR}/include
 	${EIGEN3_INCLUDE_DIRS}
+	${QPOASES_INCLUDE_DIRS}
 )
 
-add_executable(governor_node src/double_integrator.cpp src/bezier_utilities.cpp src/trajectory.cpp)
+add_executable(governor_node src/double_integrator.cpp src/bezier_utilities.cpp src/trajectory.cpp src/logGPIS.cpp src/gp_matern32)
 ament_target_dependencies(governor_node
 	rclcpp px4_msgs Eigen3 std_msgs visualization_msgs geometry_msgs tf2 tf2_ros
 )
+target_link_libraries(governor_node qpOASES)
 
 add_executable(visualization_test src/sphere_and_cylinder_test.cpp src/logGPIS.cpp src/gp_matern32.cpp)
 ament_target_dependencies(visualization_test 

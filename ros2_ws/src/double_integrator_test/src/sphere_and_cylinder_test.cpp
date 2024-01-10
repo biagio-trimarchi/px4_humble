@@ -31,7 +31,7 @@ class LogGPISTest : public rclcpp::Node {
 						"/log_gpis", 10
 					);
 			
-			double lamba_whittle = 7.5;
+			double lamba_whittle = 5.0;
 			double resolution = 0.2;
 			double error_variance = 0.01;
 			log_gpis = LogGPIS(lamba_whittle, resolution, error_variance);
@@ -53,7 +53,7 @@ class LogGPISTest : public rclcpp::Node {
 
 			// Add Sphere
 			Eigen::Vector3d sphere_center(2.0, 2.0, 3.0);
-			double sphere_radius = 3.0;
+			double sphere_radius = 0.3;
 			for (double psi = 0.0; psi < M_PI+0.1; psi += 0.2){
 				for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
 					Eigen::Vector3d point(sin(psi) * cos(theta),
@@ -66,11 +66,13 @@ class LogGPISTest : public rclcpp::Node {
 			}
 
 			Eigen::Vector3d cylinder_center_ground(-1.0, -3.0, 0.0);
-			double cylinder_radius = 1.5;
+			double cylinder_radius = 0.5;
 			for (double z = 0.0; z < 2.1; z += 0.2){
 				for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
-					Eigen::Vector3d point(cos(theta), sin(theta), z);
-					point = cylinder_center_ground + cylinder_radius * point;
+					Eigen::Vector3d point(cylinder_radius * cos(theta), 
+					                      cylinder_radius * sin(theta), 
+					                      z);
+					point = cylinder_center_ground + point;
 					log_gpis.add_sample(point);
 				}
 			}
