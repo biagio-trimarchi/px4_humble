@@ -12,6 +12,7 @@ find_package(std_msgs REQUIRED)
 find_package(px4_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(gazebo_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -28,12 +29,25 @@ ament_target_dependencies(governor_node
 )
 target_link_libraries(governor_node qpOASES)
 
+add_executable(governor_node_2 src/double_integrator_2.cpp src/bezier_utilities.cpp src/trajectory.cpp src/logGPIS.cpp src/gp_matern32)
+ament_target_dependencies(governor_node_2
+	rclcpp px4_msgs Eigen3 std_msgs visualization_msgs geometry_msgs tf2 tf2_ros
+)
+target_link_libraries(governor_node_2 qpOASES)
+
+add_executable(gazebo_pose_publisher src/model_state_publisher.cpp)
+ament_target_dependencies(gazebo_pose_publisher
+	rclcpp gazebo_msgs
+)
+
 add_executable(visualization_test src/sphere_and_cylinder_test.cpp src/logGPIS.cpp src/gp_matern32.cpp)
 ament_target_dependencies(visualization_test 
 	rclcpp Eigen3 visualization_msgs geometry_msgs
 )
 
 install( TARGETS governor_node DESTINATION lib/${PROJECT_NAME})
+install( TARGETS governor_node_2 DESTINATION lib/${PROJECT_NAME})
+install( TARGETS gazebo_pose_publisher DESTINATION lib/${PROJECT_NAME})
 install( TARGETS visualization_test DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)

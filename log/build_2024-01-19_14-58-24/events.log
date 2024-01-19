@@ -1,0 +1,186 @@
+[0.000000] (-) TimerEvent: {}
+[0.000122] (-) JobUnselected: {'identifier': 'double_integrator_test'}
+[0.000149] (-) JobUnselected: {'identifier': 'simple_qps'}
+[0.000160] (-) JobUnselected: {'identifier': 'simulation_manager'}
+[0.000168] (-) JobUnselected: {'identifier': 'tf2_manager'}
+[0.000177] (log_gpis) JobQueued: {'identifier': 'log_gpis', 'dependencies': OrderedDict()}
+[0.000545] (log_gpis) JobStarted: {'identifier': 'log_gpis'}
+[0.030611] (log_gpis) JobProgress: {'identifier': 'log_gpis', 'progress': 'cmake'}
+[0.030662] (log_gpis) Command: {'cmd': ['/usr/bin/cmake', '/home/docker-dev/ws/ros2_ws/src/log_gpis', '-DCMAKE_INSTALL_PREFIX=/home/docker-dev/ws/install/log_gpis'], 'cwd': '/home/docker-dev/ws/build/log_gpis', 'env': OrderedDict([('HOSTNAME', 'Athena-TULPAR-T5-V23-2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/docker-dev/PX4/px4_ros_interface/install/px4_ros_com/lib:/home/docker-dev/PX4/px4_ros_interface/install/px4_msgs/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/docker-dev'), ('OLDPWD', '/home/docker-dev'), ('ROS_PYTHON_VERSION', '3'), ('COLCON_PREFIX_PATH', '/home/docker-dev/PX4/px4_ros_interface/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('USERNAME', 'docker-dev'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/home/docker-dev/PX4/px4_ros_interface/install/px4_ros_com:/home/docker-dev/PX4/px4_ros_interface/install/px4_msgs:/opt/ros/humble'), ('DEBIAN_FRONTEND', 'noninteractive'), ('PWD', '/home/docker-dev/ws/build/log_gpis'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/home/docker-dev/PX4/px4_ros_interface/install/px4_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/home/docker-dev/PX4/px4_ros_interface/install/px4_ros_com:/home/docker-dev/PX4/px4_ros_interface/install/px4_msgs:/opt/ros/humble')]), 'shell': False}
+[0.062741] (log_gpis) StdoutLine: {'line': b'-- The C compiler identification is GNU 11.4.0\n'}
+[0.093457] (log_gpis) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 11.4.0\n'}
+[0.097600] (log_gpis) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.099887] (-) TimerEvent: {}
+[0.135384] (log_gpis) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.139645] (log_gpis) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[0.139721] (log_gpis) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.139768] (log_gpis) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.141785] (log_gpis) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.185872] (log_gpis) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.189876] (log_gpis) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[0.189945] (log_gpis) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.190100] (log_gpis) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.192159] (log_gpis) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.6 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.200087] (-) TimerEvent: {}
+[0.292882] (log_gpis) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter \n'}
+[0.300161] (-) TimerEvent: {}
+[0.353361] (log_gpis) StdoutLine: {'line': b'-- Found rclcpp: 16.0.7 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.387153] (log_gpis) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.391687] (log_gpis) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.397992] (log_gpis) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.400230] (-) TimerEvent: {}
+[0.407708] (log_gpis) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.421614] (log_gpis) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.470690] (log_gpis) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.472982] (log_gpis) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.5 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.500323] (-) TimerEvent: {}
+[0.539391] (log_gpis) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  \n'}
+[0.561712] (log_gpis) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/humble/include  \n'}
+[0.600402] (-) TimerEvent: {}
+[0.601083] (log_gpis) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[0.609202] (log_gpis) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[0.651290] (log_gpis) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[0.651437] (log_gpis) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[0.691081] (log_gpis) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success\n'}
+[0.691820] (log_gpis) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[0.700466] (-) TimerEvent: {}
+[0.790204] (log_gpis) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)\n'}
+[0.800573] (-) TimerEvent: {}
+[0.900754] (-) TimerEvent: {}
+[0.947294] (log_gpis) StdoutLine: {'line': b'-- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)\n'}
+[1.000842] (-) TimerEvent: {}
+[1.101075] (-) TimerEvent: {}
+[1.124297] (log_gpis) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[1.193161] (log_gpis) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.201242] (-) TimerEvent: {}
+[1.206310] (log_gpis) StdoutLine: {'line': b'-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") \n'}
+[1.207881] (log_gpis) StdoutLine: {'line': b'-- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)\n'}
+[1.221887] (log_gpis) StdoutLine: {'line': b'-- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") \n'}
+[1.221985] (log_gpis) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[1.222016] (log_gpis) StdoutLine: {'line': b'-- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10\n'}
+[1.222042] (log_gpis) StdoutLine: {'line': b'-- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so\n'}
+[1.234444] (log_gpis) StdoutLine: {'line': b'-- Found PythonExtra: .so  \n'}
+[1.267953] (log_gpis) StdoutLine: {'line': b'-- Configuring done\n'}
+[1.282824] (log_gpis) StdoutLine: {'line': b'-- Generating done\n'}
+[1.284155] (log_gpis) StdoutLine: {'line': b'-- Build files have been written to: /home/docker-dev/ws/build/log_gpis\n'}
+[1.290947] (log_gpis) CommandEnded: {'returncode': 0}
+[1.291164] (log_gpis) JobProgress: {'identifier': 'log_gpis', 'progress': 'build'}
+[1.291178] (log_gpis) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/docker-dev/ws/build/log_gpis', '--', '-j6', '-l6'], 'cwd': '/home/docker-dev/ws/build/log_gpis', 'env': OrderedDict([('HOSTNAME', 'Athena-TULPAR-T5-V23-2'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/docker-dev/PX4/px4_ros_interface/install/px4_ros_com/lib:/home/docker-dev/PX4/px4_ros_interface/install/px4_msgs/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/docker-dev'), ('OLDPWD', '/home/docker-dev'), ('ROS_PYTHON_VERSION', '3'), ('COLCON_PREFIX_PATH', '/home/docker-dev/PX4/px4_ros_interface/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('USERNAME', 'docker-dev'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/home/docker-dev/PX4/px4_ros_interface/install/px4_ros_com:/home/docker-dev/PX4/px4_ros_interface/install/px4_msgs:/opt/ros/humble'), ('DEBIAN_FRONTEND', 'noninteractive'), ('PWD', '/home/docker-dev/ws/build/log_gpis'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/home/docker-dev/PX4/px4_ros_interface/install/px4_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/home/docker-dev/PX4/px4_ros_interface/install/px4_ros_com:/home/docker-dev/PX4/px4_ros_interface/install/px4_msgs:/opt/ros/humble')]), 'shell': False}
+[1.301412] (-) TimerEvent: {}
+[1.312788] (log_gpis) StdoutLine: {'line': b'[  2%] \x1b[34m\x1b[1mGenerating C code for ROS interfaces\x1b[0m\n'}
+[1.320647] (log_gpis) StdoutLine: {'line': b'[  5%] \x1b[34m\x1b[1mGenerating C++ code for ROS interfaces\x1b[0m\n'}
+[1.321312] (log_gpis) StdoutLine: {'line': b'[  8%] \x1b[32mBuilding CXX object CMakeFiles/logGPIS.dir/src/logGPIS.cpp.o\x1b[0m\n'}
+[1.321508] (log_gpis) StdoutLine: {'line': b'[ 11%] \x1b[32mBuilding CXX object CMakeFiles/logGPIS.dir/src/gp_matern32.cpp.o\x1b[0m\n'}
+[1.322781] (log_gpis) StdoutLine: {'line': b'[ 11%] Built target ament_cmake_python_copy_log_gpis\n'}
+[1.401504] (-) TimerEvent: {}
+[1.495712] (log_gpis) StdoutLine: {'line': b'[ 11%] Built target log_gpis__cpp\n'}
+[1.501600] (-) TimerEvent: {}
+[1.503766] (log_gpis) StdoutLine: {'line': b'[ 17%] \x1b[34m\x1b[1mGenerating C++ type support dispatch for ROS interfaces\x1b[0m\n'}
+[1.503897] (log_gpis) StdoutLine: {'line': b'[ 17%] \x1b[34m\x1b[1mGenerating C++ type support for eProsima Fast-RTPS\x1b[0m\n'}
+[1.552138] (log_gpis) StdoutLine: {'line': b'running egg_info\n'}
+[1.552936] (log_gpis) StdoutLine: {'line': b'creating log_gpis.egg-info\n'}
+[1.553074] (log_gpis) StdoutLine: {'line': b'writing log_gpis.egg-info/PKG-INFO\n'}
+[1.553169] (log_gpis) StdoutLine: {'line': b'writing dependency_links to log_gpis.egg-info/dependency_links.txt\n'}
+[1.553292] (log_gpis) StdoutLine: {'line': b'writing top-level names to log_gpis.egg-info/top_level.txt\n'}
+[1.553414] (log_gpis) StdoutLine: {'line': b"writing manifest file 'log_gpis.egg-info/SOURCES.txt'\n"}
+[1.555390] (log_gpis) StdoutLine: {'line': b"reading manifest file 'log_gpis.egg-info/SOURCES.txt'\n"}
+[1.555805] (log_gpis) StdoutLine: {'line': b"writing manifest file 'log_gpis.egg-info/SOURCES.txt'\n"}
+[1.580643] (log_gpis) StdoutLine: {'line': b'[ 17%] Built target ament_cmake_python_build_log_gpis_egg\n'}
+[1.590024] (log_gpis) StdoutLine: {'line': b'[ 20%] \x1b[34m\x1b[1mGenerating C++ introspection for ROS interfaces\x1b[0m\n'}
+[1.601676] (-) TimerEvent: {}
+[1.643341] (log_gpis) StdoutLine: {'line': b'[ 23%] \x1b[32mBuilding C object CMakeFiles/log_gpis__rosidl_generator_c.dir/rosidl_generator_c/log_gpis/srv/detail/query_estimate__functions.c.o\x1b[0m\n'}
+[1.701772] (-) TimerEvent: {}
+[1.708929] (log_gpis) StdoutLine: {'line': b'[ 26%] \x1b[32m\x1b[1mLinking C shared library liblog_gpis__rosidl_generator_c.so\x1b[0m\n'}
+[1.743631] (log_gpis) StdoutLine: {'line': b'[ 26%] Built target log_gpis__rosidl_generator_c\n'}
+[1.753281] (log_gpis) StdoutLine: {'line': b'[ 29%] \x1b[34m\x1b[1mGenerating C type support for eProsima Fast-RTPS\x1b[0m\n'}
+[1.769281] (log_gpis) StdoutLine: {'line': b'[ 32%] \x1b[32mBuilding CXX object CMakeFiles/log_gpis__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/log_gpis/srv/query_estimate__type_support.cpp.o\x1b[0m\n'}
+[1.801866] (-) TimerEvent: {}
+[1.803217] (log_gpis) StdoutLine: {'line': b'[ 35%] \x1b[32mBuilding CXX object CMakeFiles/log_gpis__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/log_gpis/srv/detail/dds_fastrtps/query_estimate__type_support.cpp.o\x1b[0m\n'}
+[1.883273] (log_gpis) StdoutLine: {'line': b'[ 38%] \x1b[32mBuilding CXX object CMakeFiles/log_gpis__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/log_gpis/srv/detail/query_estimate__type_support.cpp.o\x1b[0m\n'}
+[1.901960] (-) TimerEvent: {}
+[2.002214] (-) TimerEvent: {}
+[2.022376] (log_gpis) StdoutLine: {'line': b'[ 41%] \x1b[32m\x1b[1mLinking CXX shared library liblog_gpis__rosidl_typesupport_cpp.so\x1b[0m\n'}
+[2.068073] (log_gpis) StdoutLine: {'line': b'[ 41%] Built target log_gpis__rosidl_typesupport_cpp\n'}
+[2.070209] (log_gpis) StdoutLine: {'line': b'[ 44%] \x1b[32mBuilding CXX object CMakeFiles/log_gpis__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/log_gpis/srv/detail/query_estimate__type_support_c.cpp.o\x1b[0m\n'}
+[2.077526] (log_gpis) StdoutLine: {'line': b'[ 47%] \x1b[34m\x1b[1mGenerating C introspection for ROS interfaces\x1b[0m\n'}
+[2.102305] (-) TimerEvent: {}
+[2.167728] (log_gpis) StdoutLine: {'line': b'[ 50%] \x1b[32m\x1b[1mLinking CXX shared library liblog_gpis__rosidl_typesupport_fastrtps_cpp.so\x1b[0m\n'}
+[2.202401] (-) TimerEvent: {}
+[2.236866] (log_gpis) StdoutLine: {'line': b'[ 50%] Built target log_gpis__rosidl_typesupport_fastrtps_cpp\n'}
+[2.246622] (log_gpis) StdoutLine: {'line': b'[ 52%] \x1b[34m\x1b[1mGenerating C type support dispatch for ROS interfaces\x1b[0m\n'}
+[2.247541] (log_gpis) StdoutLine: {'line': b'[ 55%] \x1b[32m\x1b[1mLinking CXX shared library liblog_gpis__rosidl_typesupport_introspection_cpp.so\x1b[0m\n'}
+[2.302492] (-) TimerEvent: {}
+[2.314969] (log_gpis) StdoutLine: {'line': b'[ 55%] Built target log_gpis__rosidl_typesupport_introspection_cpp\n'}
+[2.370877] (log_gpis) StdoutLine: {'line': b'[ 58%] \x1b[32mBuilding C object CMakeFiles/log_gpis__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/log_gpis/srv/detail/query_estimate__type_support.c.o\x1b[0m\n'}
+[2.392036] (log_gpis) StdoutLine: {'line': b'[ 61%] \x1b[32m\x1b[1mLinking CXX shared library liblog_gpis__rosidl_typesupport_fastrtps_c.so\x1b[0m\n'}
+[2.402581] (-) TimerEvent: {}
+[2.407941] (log_gpis) StdoutLine: {'line': b'[ 64%] \x1b[32m\x1b[1mLinking C shared library liblog_gpis__rosidl_typesupport_introspection_c.so\x1b[0m\n'}
+[2.437311] (log_gpis) StdoutLine: {'line': b'[ 64%] Built target log_gpis__rosidl_typesupport_introspection_c\n'}
+[2.460872] (log_gpis) StdoutLine: {'line': b'[ 64%] Built target log_gpis__rosidl_typesupport_fastrtps_c\n'}
+[2.464373] (log_gpis) StdoutLine: {'line': b'[ 67%] \x1b[32mBuilding CXX object CMakeFiles/log_gpis__rosidl_typesupport_c.dir/rosidl_typesupport_c/log_gpis/srv/query_estimate__type_support.cpp.o\x1b[0m\n'}
+[2.481890] (log_gpis) StdoutLine: {'line': b'[ 70%] \x1b[32m\x1b[1mLinking CXX shared library liblog_gpis__rosidl_typesupport_c.so\x1b[0m\n'}
+[2.500394] (log_gpis) StderrLine: {'line': b'\x1b[01m\x1b[K/home/docker-dev/ws/ros2_ws/src/log_gpis/src/gp_matern32.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid GaussianProcessMatern32::loadData(Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::VectorXd&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[2.500571] (log_gpis) StderrLine: {'line': b'\x1b[01m\x1b[K/home/docker-dev/ws/ros2_ws/src/log_gpis/src/gp_matern32.cpp:132:22:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kcerr\x1b[m\x1b[K\xe2\x80\x99 is not a member of \xe2\x80\x98\x1b[01m\x1b[Kstd\x1b[m\x1b[K\xe2\x80\x99\n'}
+[2.500643] (log_gpis) StderrLine: {'line': b'  132 |                 std::\x1b[01;31m\x1b[Kcerr\x1b[m\x1b[K << "GPMatern32 : Matrix dimensions do not coincide. Loading failed" << std::endl;\n'}
+[2.500727] (log_gpis) StderrLine: {'line': b'      |                      \x1b[01;31m\x1b[K^~~~\x1b[m\x1b[K\n'}
+[2.500782] (log_gpis) StderrLine: {'line': b'\x1b[01m\x1b[K/home/docker-dev/ws/ros2_ws/src/log_gpis/src/gp_matern32.cpp:3:1:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kstd::cerr\x1b[m\x1b[K\xe2\x80\x99 is defined in header \xe2\x80\x98\x1b[01m\x1b[K<iostream>\x1b[m\x1b[K\xe2\x80\x99; did you forget to \xe2\x80\x98\x1b[01m\x1b[K#include <iostream>\x1b[m\x1b[K\xe2\x80\x99?\n'}
+[2.500836] (log_gpis) StderrLine: {'line': b'    2 | #include <log_gpis/gp_matern32.hpp>\n'}
+[2.500884] (log_gpis) StderrLine: {'line': b'  +++ |+\x1b[32m\x1b[K#include <iostream>\x1b[m\x1b[K\n'}
+[2.500932] (log_gpis) StderrLine: {'line': b'    3 | \n'}
+[2.502655] (-) TimerEvent: {}
+[2.505808] (log_gpis) StdoutLine: {'line': b'[ 70%] Built target log_gpis__rosidl_typesupport_c\n'}
+[2.517525] (log_gpis) StdoutLine: {'line': b'[ 70%] Built target log_gpis\n'}
+[2.529814] (log_gpis) StdoutLine: {'line': b'[ 73%] \x1b[34m\x1b[1mGenerating Python code for ROS interfaces\x1b[0m\n'}
+[2.602753] (-) TimerEvent: {}
+[2.702988] (-) TimerEvent: {}
+[2.746380] (log_gpis) StdoutLine: {'line': b'[ 73%] Built target log_gpis__py\n'}
+[2.757498] (log_gpis) StdoutLine: {'line': b'[ 76%] \x1b[32mBuilding C object CMakeFiles/log_gpis__rosidl_generator_py.dir/rosidl_generator_py/log_gpis/srv/_query_estimate_s.c.o\x1b[0m\n'}
+[2.803092] (-) TimerEvent: {}
+[2.822222] (log_gpis) StdoutLine: {'line': b'[ 79%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/log_gpis/liblog_gpis__rosidl_generator_py.so\x1b[0m\n'}
+[2.846533] (log_gpis) StdoutLine: {'line': b'[ 79%] Built target log_gpis__rosidl_generator_py\n'}
+[2.860409] (log_gpis) StdoutLine: {'line': b'[ 82%] \x1b[32mBuilding C object CMakeFiles/log_gpis__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/log_gpis/_log_gpis_s.ep.rosidl_typesupport_c.c.o\x1b[0m\n'}
+[2.860705] (log_gpis) StdoutLine: {'line': b'[ 85%] \x1b[32mBuilding C object CMakeFiles/log_gpis__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/log_gpis/_log_gpis_s.ep.rosidl_typesupport_fastrtps_c.c.o\x1b[0m\n'}
+[2.861778] (log_gpis) StdoutLine: {'line': b'[ 88%] \x1b[32mBuilding C object CMakeFiles/log_gpis__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/log_gpis/_log_gpis_s.ep.rosidl_typesupport_introspection_c.c.o\x1b[0m\n'}
+[2.903198] (-) TimerEvent: {}
+[2.922213] (log_gpis) StdoutLine: {'line': b'[ 91%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/log_gpis/log_gpis_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[2.943702] (log_gpis) StdoutLine: {'line': b'[ 91%] Built target log_gpis__rosidl_typesupport_introspection_c__pyext\n'}
+[2.953460] (log_gpis) StdoutLine: {'line': b'[ 94%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/log_gpis/log_gpis_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[2.956217] (log_gpis) StdoutLine: {'line': b'[ 97%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/log_gpis/log_gpis_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[2.973093] (log_gpis) StdoutLine: {'line': b'[ 97%] Built target log_gpis__rosidl_typesupport_c__pyext\n'}
+[2.975876] (log_gpis) StdoutLine: {'line': b'[ 97%] Built target log_gpis__rosidl_typesupport_fastrtps_c__pyext\n'}
+[3.003316] (-) TimerEvent: {}
+[3.103582] (-) TimerEvent: {}
+[3.203863] (-) TimerEvent: {}
+[3.304123] (-) TimerEvent: {}
+[3.404374] (-) TimerEvent: {}
+[3.504638] (-) TimerEvent: {}
+[3.604901] (-) TimerEvent: {}
+[3.705143] (-) TimerEvent: {}
+[3.805381] (-) TimerEvent: {}
+[3.905622] (-) TimerEvent: {}
+[4.005859] (-) TimerEvent: {}
+[4.106126] (-) TimerEvent: {}
+[4.206377] (-) TimerEvent: {}
+[4.306649] (-) TimerEvent: {}
+[4.406922] (-) TimerEvent: {}
+[4.507166] (-) TimerEvent: {}
+[4.607432] (-) TimerEvent: {}
+[4.707711] (-) TimerEvent: {}
+[4.807964] (-) TimerEvent: {}
+[4.908216] (-) TimerEvent: {}
+[5.008451] (-) TimerEvent: {}
+[5.108689] (-) TimerEvent: {}
+[5.208923] (-) TimerEvent: {}
+[5.309199] (-) TimerEvent: {}
+[5.409448] (-) TimerEvent: {}
+[5.509713] (-) TimerEvent: {}
+[5.609951] (-) TimerEvent: {}
+[5.710201] (-) TimerEvent: {}
+[5.810446] (-) TimerEvent: {}
+[5.857481] (log_gpis) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/logGPIS.dir/build.make:90: CMakeFiles/logGPIS.dir/src/gp_matern32.cpp.o] Error 1\n'}
+[5.857646] (log_gpis) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:592: CMakeFiles/logGPIS.dir/all] Error 2\n'}
+[5.857813] (log_gpis) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[5.859257] (log_gpis) CommandEnded: {'returncode': 2}
+[5.910553] (-) TimerEvent: {}
+[5.917103] (log_gpis) JobEnded: {'identifier': 'log_gpis', 'rc': 2}
+[5.927499] (-) EventReactorShutdown: {}

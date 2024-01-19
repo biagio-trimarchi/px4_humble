@@ -1,0 +1,6 @@
+{
+  "package_name": "log_gpis",
+  "non_idl_tuples": [
+    "/home/docker-dev/ws/ros2_ws/src/log_gpis:srv/QueryEstimate.srv"
+  ]
+}

@@ -1,0 +1,185 @@
+[0.033s] Invoking command in '/home/docker-dev/ws/build/log_gpis': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/docker-dev/ws/build/log_gpis -- -j6 -l6
+[0.057s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_generator_c[0m
+[0.059s] [35m[1mConsolidate compiler generated dependencies of target logGPIS[0m
+[0.063s] [  8%] Built target log_gpis__rosidl_generator_c
+[0.065s] [ 11%] Built target log_gpis__cpp
+[0.070s] [ 11%] Built target ament_cmake_python_copy_log_gpis
+[0.070s] [ 14%] [32mBuilding CXX object CMakeFiles/logGPIS.dir/src/logGPIS.cpp.o[0m
+[0.070s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_c[0m
+[0.071s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_fastrtps_c[0m
+[0.071s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_introspection_c[0m
+[0.071s] [ 17%] [32mBuilding CXX object CMakeFiles/logGPIS.dir/src/gp_matern32.cpp.o[0m
+[0.078s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_cpp[0m
+[0.079s] [ 26%] Built target log_gpis__rosidl_typesupport_c
+[0.080s] [ 35%] Built target log_gpis__rosidl_typesupport_introspection_c
+[0.081s] [ 44%] Built target log_gpis__rosidl_typesupport_fastrtps_c
+[0.088s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_fastrtps_cpp[0m
+[0.089s] [ 52%] Built target log_gpis__rosidl_typesupport_cpp
+[0.090s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_introspection_cpp[0m
+[0.098s] [ 61%] Built target log_gpis__rosidl_typesupport_introspection_cpp
+[0.099s] [ 70%] Built target log_gpis__rosidl_typesupport_fastrtps_cpp
+[0.111s] [ 70%] Built target log_gpis
+[0.123s] [ 73%] Built target log_gpis__py
+[0.130s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_generator_py[0m
+[0.138s] [ 79%] Built target log_gpis__rosidl_generator_py
+[0.147s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_fastrtps_c__pyext[0m
+[0.147s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_introspection_c__pyext[0m
+[0.147s] [35m[1mConsolidate compiler generated dependencies of target log_gpis__rosidl_typesupport_c__pyext[0m
+[0.158s] [ 85%] Built target log_gpis__rosidl_typesupport_introspection_c__pyext
+[0.158s] [ 94%] Built target log_gpis__rosidl_typesupport_fastrtps_c__pyext
+[0.158s] [ 97%] Built target log_gpis__rosidl_typesupport_c__pyext
+[0.245s] running egg_info
+[0.245s] writing log_gpis.egg-info/PKG-INFO
+[0.245s] writing dependency_links to log_gpis.egg-info/dependency_links.txt
+[0.245s] writing top-level names to log_gpis.egg-info/top_level.txt
+[0.247s] reading manifest file 'log_gpis.egg-info/SOURCES.txt'
+[0.247s] writing manifest file 'log_gpis.egg-info/SOURCES.txt'
+[0.263s] [ 97%] Built target ament_cmake_python_build_log_gpis_egg
+[6.894s] [100%] [32m[1mLinking CXX shared library liblogGPIS.so[0m
+[7.098s] [100%] Built target logGPIS
+[7.112s] Invoked command in '/home/docker-dev/ws/build/log_gpis' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/docker-dev/ws/build/log_gpis -- -j6 -l6
+[7.149s] Invoking command in '/home/docker-dev/ws/build/log_gpis': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/docker-dev/ws/build/log_gpis
+[7.154s] -- Install configuration: ""
+[7.154s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/ament_index/resource_index/rosidl_interfaces/log_gpis
+[7.154s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis
+[7.154s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/query_estimate.h
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__functions.c
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__struct.h
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__functions.h
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__type_support.h
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/msg
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/msg/rosidl_generator_c__visibility_control.h
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/environment/library_path.sh
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/environment/library_path.dsv
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_generator_c.so
+[7.155s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_generator_c.so" to ""
+[7.155s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis
+[7.155s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv
+[7.155s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__rosidl_typesupport_fastrtps_c.h
+[7.155s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/msg
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_fastrtps_c.so
+[7.155s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_fastrtps_c.so" to ""
+[7.155s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis
+[7.155s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv
+[7.155s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/query_estimate.hpp
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__traits.hpp
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__builder.hpp
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__struct.hpp
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__rosidl_typesupport_fastrtps_cpp.hpp
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/dds_fastrtps
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/msg
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_fastrtps_cpp.so
+[7.156s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_fastrtps_cpp.so" to ""
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__type_support.c
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__rosidl_typesupport_introspection_c.h
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/msg
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_introspection_c.so
+[7.156s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_introspection_c.so" to ""
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_c.so
+[7.156s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_c.so" to ""
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv
+[7.156s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__rosidl_typesupport_introspection_cpp.hpp
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/log_gpis/srv/detail/query_estimate__type_support.cpp
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_introspection_cpp.so
+[7.156s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_introspection_cpp.so" to ""
+[7.156s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_cpp.so
+[7.157s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_typesupport_cpp.so" to ""
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/environment/pythonpath.sh
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/environment/pythonpath.dsv
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis-0.0.1-py3.10.egg-info
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis-0.0.1-py3.10.egg-info/dependency_links.txt
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis-0.0.1-py3.10.egg-info/SOURCES.txt
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis-0.0.1-py3.10.egg-info/top_level.txt
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis-0.0.1-py3.10.egg-info/PKG-INFO
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/_log_gpis_s.ep.rosidl_typesupport_introspection_c.c
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/_log_gpis_s.ep.rosidl_typesupport_fastrtps_c.c
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/srv
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/srv/_query_estimate_s.c
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/srv/_query_estimate.py
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/srv/__init__.py
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/liblog_gpis__rosidl_generator_py.so
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/_log_gpis_s.ep.rosidl_typesupport_c.c
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/__init__.py
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[7.157s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[7.178s] Listing '/home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis'...
+[7.178s] Compiling '/home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/__init__.py'...
+[7.178s] Listing '/home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/srv'...
+[7.178s] Compiling '/home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/srv/__init__.py'...
+[7.178s] Compiling '/home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/srv/_query_estimate.py'...
+[7.181s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[7.181s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so" to ""
+[7.181s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[7.181s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so" to ""
+[7.181s] -- Installing: /home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[7.182s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/local/lib/python3.10/dist-packages/log_gpis/log_gpis_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so" to ""
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_generator_py.so
+[7.182s] -- Set runtime path of "/home/docker-dev/ws/install/log_gpis/lib/liblog_gpis__rosidl_generator_py.so" to ""
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/srv/QueryEstimate.idl
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/srv/QueryEstimate.srv
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/srv/QueryEstimate_Request.msg
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/srv/QueryEstimate_Response.msg
+[7.182s] -- Up-to-date: /home/docker-dev/ws/install/log_gpis/include/log_gpis
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/gp_matern32.hpp
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/logGPIS.hpp
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/include/log_gpis/.gp_matern32.hpp.swp
+[7.182s] -- Installing: /home/docker-dev/ws/install/log_gpis/lib/liblogGPIS.so
+[7.186s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/ament_index/resource_index/package_run_dependencies/log_gpis
+[7.186s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/ament_index/resource_index/parent_prefix_path/log_gpis
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/environment/ament_prefix_path.sh
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/environment/ament_prefix_path.dsv
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/environment/path.sh
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/environment/path.dsv
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/local_setup.bash
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/local_setup.sh
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/local_setup.zsh
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/local_setup.dsv
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/package.dsv
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/ament_index/resource_index/packages/log_gpis
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_generator_cExport.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_generator_cExport-noconfig.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_typesupport_fastrtps_cExport.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_generator_cppExport.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_typesupport_fastrtps_cppExport.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpis__rosidl_typesupport_introspection_cExport.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpis__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[7.187s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpis__rosidl_typesupport_cExport.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpis__rosidl_typesupport_cExport-noconfig.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpis__rosidl_typesupport_introspection_cppExport.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpis__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpis__rosidl_typesupport_cppExport.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpis__rosidl_typesupport_cppExport-noconfig.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_generator_pyExport.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/export_log_gpis__rosidl_generator_pyExport-noconfig.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/logGPISExport.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/logGPISExport-noconfig.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/rosidl_cmake-extras.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/ament_cmake_export_include_directories-extras.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/ament_cmake_export_libraries-extras.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/ament_cmake_export_targets-extras.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/ament_cmake_export_dependencies-extras.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpisConfig.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/cmake/log_gpisConfig-version.cmake
+[7.188s] -- Installing: /home/docker-dev/ws/install/log_gpis/share/log_gpis/package.xml
+[7.190s] Invoked command in '/home/docker-dev/ws/build/log_gpis' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/docker-dev/ws/build/log_gpis

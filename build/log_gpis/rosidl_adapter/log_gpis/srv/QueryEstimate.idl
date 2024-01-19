@@ -1,0 +1,21 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from log_gpis/srv/QueryEstimate.srv
+// generated code does not contain a copyright notice
+
+
+module log_gpis {
+  module srv {
+    struct QueryEstimate_Request {
+      uint8 structure_needs_at_least_one_member;
+    };
+    typedef double double__3[3];
+    typedef double double__9[9];
+    struct QueryEstimate_Response {
+      double estimate;
+
+      double__3 gradient_estimate;
+
+      double__9 hessian_estimate;
+    };
+  };
+};

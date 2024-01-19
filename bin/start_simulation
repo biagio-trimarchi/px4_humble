@@ -1,0 +1,4 @@
+#!/bin/bash
+cd ~/PX4/PX4-Autopilot/
+xterm -e "MicroXRCEAgent udp4 -p 8888" &
+make px4_sitl gz_x500_vision_lgpis_test_1

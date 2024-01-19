@@ -28,16 +28,16 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	qpOASES_lb << -10.0, -10.0, -10.0;
 	qpOASES_ub << 10.0, 10.0, 10.0;
 
-	gp_lambda_whittle = 5.0;
-	gp_resolution = 0.2;
+	gp_lambda_whittle = 20.0;
+	gp_resolution = 0.1;
 	gp_error_variance = 0.01;
 	log_gpis = LogGPIS(gp_lambda_whittle, gp_resolution, gp_error_variance);
 	is_log_gpis_trained = false;
 	bf_classK_gain_1 = 2.0;
-	bf_classK_gain_1 = 0.5;
+	bf_classK_gain_2 = 0.5;
 	bf_gain_lie_0_kh = bf_classK_gain_1 * bf_classK_gain_2;
 	bf_gain_lie_1_kh = bf_classK_gain_1 + bf_classK_gain_2;
-	bf_safe_margin = 0.1;
+	bf_safe_margin = 0.3;
 
 	addGroundSphereCylinder();
 
@@ -328,12 +328,12 @@ void DoubleIntegratorGovernor::actionCallback(const std_msgs::msg::Empty msg) {
 
 void DoubleIntegratorGovernor::odometryCallback(const px4_msgs::msg::VehicleOdometry::SharedPtr msg) {
 	// Read odometry and update agent position and acceleration
-	drone_position.x() = msg->position[0];
-	drone_position.y() = -msg->position[1];
+	drone_position.x() = msg->position[1];
+	drone_position.y() = msg->position[0];
 	drone_position.z() = -msg->position[2];
 
-	drone_velocity.x() = msg->velocity[0];
-	drone_velocity.y() = -msg->velocity[1];
+	drone_velocity.x() = msg->velocity[1];
+	drone_velocity.y() = msg->velocity[0];
 	drone_velocity.z() = -msg->velocity[2];
 }
 
@@ -410,13 +410,13 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	px4_msgs::msg::OffboardControlMode offboard_msg;
 	px4_msgs::msg::TrajectorySetpoint setpoint_msg;
 
-	// offboard_msg.timestamp = this->get_clock()->now().nanoseconds() / 1000;
-	// setpoint_msg.timestamp = this->get_clock()->now().nanoseconds() / 1000;
+	offboard_msg.timestamp = this->get_clock()->now().nanoseconds() / 1000;
+	setpoint_msg.timestamp = this->get_clock()->now().nanoseconds() / 1000;
 
 	// I should try also the acceleration only control
-	offboard_msg.position = false;
+	offboard_msg.position = true;
 	offboard_msg.velocity = false;
-	offboard_msg.acceleration = true;
+	offboard_msg.acceleration = false;
 
 	setpoint_msg.position[0] = std::numeric_limits<double>::quiet_NaN();
 	setpoint_msg.position[1] = std::numeric_limits<double>::quiet_NaN();
@@ -426,16 +426,16 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	setpoint_msg.velocity[1] = std::numeric_limits<double>::quiet_NaN();
 	setpoint_msg.velocity[2] = std::numeric_limits<double>::quiet_NaN();
 
-	// setpoint_msg.position[0] = setpoint_position.x();
-	// setpoint_msg.position[1] = -setpoint_position.y();
-	// setpoint_msg.position[2] = -setpoint_position.z();
+	setpoint_msg.position[0] = setpoint_position.y();
+	setpoint_msg.position[1] = setpoint_position.x();
+	setpoint_msg.position[2] = -setpoint_position.z();
 
-	// setpoint_msg.velocity[0] = setpoint_velocity.x();
-	// setpoint_msg.velocity[1] = -setpoint_velocity.y();
-	// setpoint_msg.velocity[2] = -setpoint_velocity.z();
+	setpoint_msg.velocity[0] = setpoint_velocity.y();
+	setpoint_msg.velocity[1] = setpoint_velocity.x();
+	setpoint_msg.velocity[2] = -setpoint_velocity.z();
 
-	setpoint_msg.acceleration[0] = setpoint_acceleration.x();
-	setpoint_msg.acceleration[1] = -setpoint_acceleration.y();
+	setpoint_msg.acceleration[0] = setpoint_acceleration.y();
+	setpoint_msg.acceleration[1] = setpoint_acceleration.x();
 	setpoint_msg.acceleration[2] = -setpoint_acceleration.z();
 
 	offboard_publisher->publish(offboard_msg);
@@ -451,9 +451,28 @@ void DoubleIntegratorGovernor::addGroundSphereCylinder() {
 			}
 		}
 
-		// Add Sphere
-		Eigen::Vector3d sphere_center(2.0, 2.0, 3.0);
-		double sphere_radius = 0.3;
+		// Add Box 1
+		for (double z = 0.0; z < 1.1; z += 0.2) {
+			for (double s = 0.0; s < 2.0*4.0 + 2.0*2.0 + 0.1; s+=0.2) {
+				if (s < 4.0) {
+					Eigen::Vector3d point(-1.0 - s, -3.0, z);
+					log_gpis.add_sample(point);
+				} else if (s < 6.0) {
+					Eigen::Vector3d point(-5.0, -3.0 - (s - 4.0), z);
+					log_gpis.add_sample(point);
+				} else if (s < 10.0) {
+					Eigen::Vector3d point(-5.0 + (s - 6.0), -5.0, z);
+					log_gpis.add_sample(point);
+				} else {
+					Eigen::Vector3d point(-3.0, -5.0 + (s - 10.0), z);
+					log_gpis.add_sample(point);
+				}
+			}
+		}
+
+		// Add Sphere 1
+		Eigen::Vector3d sphere_center(3.0, -3.0, 1.0);
+		double sphere_radius = 1.0;
 		for (double psi = 0.0; psi < M_PI+0.1; psi += 0.2){
 			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
 				Eigen::Vector3d point(sin(psi) * cos(theta),
@@ -464,10 +483,37 @@ void DoubleIntegratorGovernor::addGroundSphereCylinder() {
 				log_gpis.add_sample(point);
 			}
 		}
+		
+		// Add Cylinder 1
+		Eigen::Vector3d cylinder_center_ground(4.0, 4.0, 0.0);
+		double cylinder_radius = 1.0;
+		for (double z = 0.0; z < 3.1; z += 0.2){
+			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
+				Eigen::Vector3d point(cylinder_radius * cos(theta), 
+				                      cylinder_radius * sin(theta), 
+				                      z);
+				point = cylinder_center_ground + cylinder_radius * point;
+				log_gpis.add_sample(point);
+			}
+		}
 
-		Eigen::Vector3d cylinder_center_ground(-1.0, -3.0, 0.0);
-		double cylinder_radius = 0.5;
-		for (double z = 0.0; z < 2.1; z += 0.2){
+		// Add Cylinder 2
+		cylinder_center_ground = Eigen::Vector3d(-3.0, 2.0, 0.0);
+		cylinder_radius = 1.0;
+		for (double z = 0.0; z < 3.1; z += 0.2){
+			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
+				Eigen::Vector3d point(cylinder_radius * cos(theta), 
+				                      cylinder_radius * sin(theta), 
+				                      z);
+				point = cylinder_center_ground + cylinder_radius * point;
+				log_gpis.add_sample(point);
+			}
+		}
+ 
+		// Add Cylinder 3
+		cylinder_center_ground = Eigen::Vector3d(-3.0, -2.0, 0.0);
+		cylinder_radius = 0.5;
+		for (double z = 0.0; z < 3.1; z += 0.2){
 			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
 				Eigen::Vector3d point(cylinder_radius * cos(theta), 
 				                      cylinder_radius * sin(theta), 

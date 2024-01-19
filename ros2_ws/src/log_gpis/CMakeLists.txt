@@ -7,18 +7,38 @@ endif()
 
 # Find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclpy REQUIRED)
-find_package(visualization_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+include_directories(
+	${PROJECT_SOURCE_DIR}/include
+	${EIGEN3_INCLUDE_DIRS}
+)
+
+# Create Interface
+rosidl_generate_interfaces(${PROJECT_NAME}
+	"srv/QueryEstimate.srv"
+)
+
+# Add Library
+add_library(logGPIS SHARED src/logGPIS.cpp src/gp_matern32.cpp)
+ament_target_dependencies(logGPIS Eigen3)
+ament_export_targets(logGPIS HAS_LIBRARY_TARGET)
 
 # Install
-ament_python_install_package(${PROJECT_NAME})
+install(
+	DIRECTORY include/log_gpis
+	DESTINATION include
+)
 
-install(PROGRAMS
-	scripts/logGPIS_node.py
-	DESTINATION lib/${PROJECT_NAME}
+install(
+	TARGETS logGPIS
+	EXPORT logGPIS
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	RUNTIME DESTINATION	bin 
+	INCLUDES DESTINATION include
 )
 
 ament_package()

@@ -1,0 +1,4 @@
+Invoking command in '/home/docker-dev/ws/build/log_gpis': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/docker-dev/ws/build/log_gpis -- -j6 -l6
+Invoked command in '/home/docker-dev/ws/build/log_gpis' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/docker-dev/ws/build/log_gpis -- -j6 -l6
+Invoking command in '/home/docker-dev/ws/build/log_gpis': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/docker-dev/ws/build/log_gpis
+Invoked command in '/home/docker-dev/ws/build/log_gpis' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/docker-dev/ws/build/log_gpis

@@ -1,0 +1,4 @@
+source;share/log_gpis/local_setup.bash
+source;share/log_gpis/local_setup.dsv
+source;share/log_gpis/local_setup.sh
+source;share/log_gpis/local_setup.zsh

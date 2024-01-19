@@ -1,0 +1,11 @@
+[01m[K/home/docker-dev/ws/ros2_ws/src/log_gpis/src/gp_matern32.cpp:[m[K In member function ‘[01m[Kvoid GaussianProcessMatern32::loadData(Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::VectorXd&)[m[K’:
+[01m[K/home/docker-dev/ws/ros2_ws/src/log_gpis/src/gp_matern32.cpp:132:22:[m[K [01;31m[Kerror: [m[K‘[01m[Kcerr[m[K’ is not a member of ‘[01m[Kstd[m[K’
+  132 |                 std::[01;31m[Kcerr[m[K << "GPMatern32 : Matrix dimensions do not coincide. Loading failed" << std::endl;
+      |                      [01;31m[K^~~~[m[K
+[01m[K/home/docker-dev/ws/ros2_ws/src/log_gpis/src/gp_matern32.cpp:3:1:[m[K [01;36m[Knote: [m[K‘[01m[Kstd::cerr[m[K’ is defined in header ‘[01m[K<iostream>[m[K’; did you forget to ‘[01m[K#include <iostream>[m[K’?
+    2 | #include <log_gpis/gp_matern32.hpp>
+  +++ |+[32m[K#include <iostream>[m[K
+    3 | 
+gmake[2]: *** [CMakeFiles/logGPIS.dir/build.make:90: CMakeFiles/logGPIS.dir/src/gp_matern32.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:592: CMakeFiles/logGPIS.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2
