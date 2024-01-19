@@ -26,10 +26,12 @@ class LogGPIS {
 
 		// Get and Set
 		Eigen::MatrixXd getK();
+		Eigen::MatrixXd getAlpha();
 		Eigen::MatrixXd getDataX();
 		Eigen::MatrixXd getDataY();
 
 		void loadData(const Eigen::MatrixXd& inputK,
+                  const Eigen::MatrixXd& input_alpha,
                   const Eigen::MatrixXd& input_data_x,
                   const Eigen::VectorXd& input_data_y);
 

@@ -6,27 +6,32 @@ void saveWorld(std::string world_name, std::string path_data_folder, LogGPIS& lo
 	}
 
 	std::string path_K_matrix = path_data_folder + (world_name + "/") + "K.txt";
+	std::string path_alpha_matrix = path_data_folder + (world_name + "/") + "alpha.txt";
 	std::string path_data_x_matrix = path_data_folder + (world_name + "/") + "data_x.txt";
 	std::string path_data_y_matrix = path_data_folder + (world_name + "/") + "data_y.txt";
 
 	saveMatrix(path_K_matrix, log_gpis.getK());
+	saveMatrix(path_alpha_matrix, log_gpis.getAlpha());
 	saveMatrix(path_data_x_matrix, log_gpis.getDataX());
 	saveMatrix(path_data_y_matrix, log_gpis.getDataY());
 }
 
 void loadWorld(std::string world_name, std::string path_data_folder, LogGPIS& log_gpis) {
 	std::string path_K_matrix = path_data_folder + (world_name + "/") + "K.txt";
+	std::string path_alpha_matrix = path_data_folder + (world_name + "/") + "alpha.txt";
 	std::string path_data_x_matrix = path_data_folder + (world_name + "/") + "data_x.txt";
 	std::string path_data_y_matrix = path_data_folder + (world_name + "/") + "data_y.txt";
 	
 	Eigen::MatrixXd K;
+	Eigen::MatrixXd alpha;
 	Eigen::MatrixXd data_x;
 	Eigen::MatrixXd data_y;
 
 	loadMatrix(path_K_matrix, K);
+	loadMatrix(path_alpha_matrix, alpha);
 	loadMatrix(path_data_x_matrix, data_x);
 	loadMatrix(path_data_y_matrix, data_y);
-	log_gpis.loadData(K, data_x, data_y);
+	log_gpis.loadData(K, alpha, data_x, data_y);
 }
 
 void saveMatrix(std::string filename, const Eigen::MatrixXd& matrix) {
@@ -149,7 +154,7 @@ void buildWorld_lgpis_test_1(LogGPIS& log_gpis) {
 				Eigen::Vector3d point(cylinder_radius * cos(theta), 
 				                      cylinder_radius * sin(theta), 
 				                      z);
-				point = cylinder_center_ground + cylinder_radius * point;
+				point = cylinder_center_ground + point;
 				log_gpis.add_sample(point);
 			}
 		}
@@ -162,7 +167,7 @@ void buildWorld_lgpis_test_1(LogGPIS& log_gpis) {
 				Eigen::Vector3d point(cylinder_radius * cos(theta), 
 				                      cylinder_radius * sin(theta), 
 				                      z);
-				point = cylinder_center_ground + cylinder_radius * point;
+				point = cylinder_center_ground + point;
 				log_gpis.add_sample(point);
 			}
 		}
@@ -175,7 +180,7 @@ void buildWorld_lgpis_test_1(LogGPIS& log_gpis) {
 				Eigen::Vector3d point(cylinder_radius * cos(theta), 
 				                      cylinder_radius * sin(theta), 
 				                      z);
-				point = cylinder_center_ground + cylinder_radius * point;
+				point = cylinder_center_ground + point;
 				log_gpis.add_sample(point);
 			}
 		}

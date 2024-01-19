@@ -4,15 +4,19 @@
   <name>simulation_manager</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="docker-dev@todo.todo">docker-dev</maintainer>
+  <maintainer email="biagio.trimarchi@unibo.it">docker-dev</maintainer>
   <license>TODO: License declaration</license>
 
 	<buildtool_depend>ament_cmake</buildtool_depend>
 
 	<depend>rclcpp</depend>
-	<depend>nav_msgs</depend>
+	<depend>tf2</depend>
 	<depend>tf2_ros</depend>
+	<depend>geometry_msgs</depend>
+	<depend>visualization_msgs</depend>
+	<depend>nav_msgs</depend>
 	<depend>log_gpis</depend>
+	<depend>Eigen3</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

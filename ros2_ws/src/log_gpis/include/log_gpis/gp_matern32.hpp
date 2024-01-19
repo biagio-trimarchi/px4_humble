@@ -14,7 +14,7 @@ class GaussianProcessMatern32 {
 		GaussianProcessMatern32();
 		GaussianProcessMatern32(double length_scale, 
 		                        double error_variance,
-														double resolution);
+                                        double resolution);
 		~GaussianProcessMatern32();
 		// Functions
 		void add_sample(Eigen::Vector3d x, double y);
@@ -27,10 +27,12 @@ class GaussianProcessMatern32 {
 
 		// Get and Set
 		Eigen::MatrixXd getK();
+		Eigen::MatrixXd getAlpha();
 		Eigen::MatrixXd getDataX();
 		Eigen::MatrixXd getDataY();
 
 		void loadData(const Eigen::MatrixXd& inputK,
+                  const Eigen::MatrixXd& input_alpha,
                   const Eigen::MatrixXd& input_data_x,
                   const Eigen::VectorXd& input_data_y);
 	

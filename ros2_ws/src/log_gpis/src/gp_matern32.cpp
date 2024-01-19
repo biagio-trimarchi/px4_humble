@@ -52,8 +52,7 @@ void GaussianProcessMatern32::train() {
 	K += error_variance * Eigen::MatrixXd::Identity(number_of_samples, number_of_samples);
 
 	L_cholesky = K.llt().matrixL();
-alpha = L_cholesky.transpose().colPivHouseholderQr().solve(L_cholesky.colPivHouseholderQr().solve(data_y));
- 
+	alpha = L_cholesky.transpose().colPivHouseholderQr().solve(L_cholesky.colPivHouseholderQr().solve(data_y)); 
 }
 
 double GaussianProcessMatern32::posterior_mean(Eigen::Vector3d x) {
@@ -116,6 +115,10 @@ Eigen::MatrixXd GaussianProcessMatern32::getK() {
 	return K;
 }
 
+Eigen::MatrixXd GaussianProcessMatern32::getAlpha() {
+	return alpha;
+}
+
 Eigen::MatrixXd GaussianProcessMatern32::getDataX() {
 	return data_x * length_scale;
 }
@@ -125,6 +128,7 @@ Eigen::MatrixXd GaussianProcessMatern32::getDataY() {
 }
 
 void GaussianProcessMatern32::loadData(const Eigen::MatrixXd& inputK,
+                                       const Eigen::MatrixXd& input_alpha,
                                        const Eigen::MatrixXd& input_data_x,
                                        const Eigen::VectorXd& input_data_y) {
 
@@ -135,8 +139,9 @@ void GaussianProcessMatern32::loadData(const Eigen::MatrixXd& inputK,
 
 	number_of_samples = inputK.cols();
 	K = inputK;
-	data_x = data_x / length_scale;
-	data_y = data_y;
+	alpha = input_alpha;
+	data_x = input_data_x / length_scale;
+	data_y = input_data_y;
 }
 
 // Private Functions

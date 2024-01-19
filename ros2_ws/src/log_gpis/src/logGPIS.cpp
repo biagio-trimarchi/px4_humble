@@ -49,6 +49,10 @@ Eigen::MatrixXd LogGPIS::getK() {
 	return gaussian_process.getK();
 }
 
+Eigen::MatrixXd LogGPIS::getAlpha() {
+	return gaussian_process.getAlpha();
+}
+
 Eigen::MatrixXd LogGPIS::getDataX() {
 	return gaussian_process.getDataX();
 }
@@ -58,8 +62,9 @@ Eigen::MatrixXd LogGPIS::getDataY() {
 }
 
 void LogGPIS::loadData(const Eigen::MatrixXd& inputK,
+                       const Eigen::MatrixXd& input_alpha,
                        const Eigen::MatrixXd& input_data_x,
                        const Eigen::VectorXd& input_data_y) {
-	gaussian_process.loadData(inputK, input_data_x, input_data_y);
+	gaussian_process.loadData(inputK, input_alpha, input_data_x, input_data_y);
 }
 
