@@ -32,18 +32,11 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	qpOASES_lb << -10.0, -10.0, -10.0;
 	qpOASES_ub << 10.0, 10.0, 10.0;
 
-	gp_lambda_whittle = 20.0;
-	gp_resolution = 0.1;
-	gp_error_variance = 0.01;
-	log_gpis = LogGPIS(gp_lambda_whittle, gp_resolution, gp_error_variance);
-	is_log_gpis_trained = false;
 	bf_classK_gain_1 = 2.0;
 	bf_classK_gain_2 = 0.5;
 	bf_gain_lie_0_kh = bf_classK_gain_1 * bf_classK_gain_2;
 	bf_gain_lie_1_kh = bf_classK_gain_1 + bf_classK_gain_2;
-	bf_safe_margin = 0.3;
-
-	addGroundSphereCylinder();
+	bf_safe_margin = 0.5;
 
 	takeoff_altitude = 1.0;
 	setpoint_position = Eigen::Vector3d(0.0, 0.0, 0.0);
@@ -169,6 +162,10 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	qos_reliable_transientLocal.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
 	qos_reliable_transientLocal.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
 
+	// Callback groups
+	callback_group_client = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+	callback_group_dynamic = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+
 	// TIMERS
 	debug_timer = this->create_wall_timer(
 				std::chrono::milliseconds(debug_timer_frequency_ms),
@@ -177,7 +174,8 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 
 	dynamics_timer = this->create_wall_timer(
 				std::chrono::milliseconds(dynamics_timer_frequency_ms),
-				std::bind(&DoubleIntegratorGovernor::dynamicsCallback, this)
+				std::bind(&DoubleIntegratorGovernor::dynamicsCallback, this),
+				callback_group_dynamic
 			);
 	
 	state_machine_timer = this->create_wall_timer(
@@ -186,8 +184,8 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 			);
 
 	// SUBSCRIPTIONS
-	odometry_subscriber = this->create_subscription<px4_msgs::msg::VehicleOdometry>(
-				"/fmu/out/vehicle_odometry", qos_sensor_data,
+	odometry_subscriber = this->create_subscription<nav_msgs::msg::Odometry>(
+				"/odometry", qos_sensor_data,
 				std::bind(&DoubleIntegratorGovernor::odometryCallback, this, _1)
 			);
 	
@@ -222,8 +220,20 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 				"/fmu/in/vehicle_command", qos_sensor_data
 			);
 	
+	// SERVICES
+	client_log_gpis = this->create_client<log_gpis::srv::QueryEstimate>(
+	  "/barrier_function", rmw_qos_profile_services_default, callback_group_client
+	);
+	
+	while(!client_log_gpis->wait_for_service(std::chrono::seconds(1))) {
+		RCLCPP_INFO(this->get_logger(), "Waiting for service to become available.");
+	}
+	RCLCPP_INFO(this->get_logger(), "Connection established with log_gpis server.");
+
 	// TF
 	tf2_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this); 	
+
+	RCLCPP_INFO(this->get_logger(), "Initialization complete");
 }
 
 DoubleIntegratorGovernor::~DoubleIntegratorGovernor() {}
@@ -326,19 +336,19 @@ void DoubleIntegratorGovernor::stateMachine() {
 	}
 }
 
-void DoubleIntegratorGovernor::actionCallback(const std_msgs::msg::Empty msg) {
+void DoubleIntegratorGovernor::actionCallback(const std_msgs::msg::Empty::SharedPtr msg) {
 	message_received = true;
 }
 
-void DoubleIntegratorGovernor::odometryCallback(const px4_msgs::msg::VehicleOdometry::SharedPtr msg) {
+void DoubleIntegratorGovernor::odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 	// Read odometry and update agent position and acceleration
-	drone_position.x() = msg->position[1];
-	drone_position.y() = msg->position[0];
-	drone_position.z() = -msg->position[2];
+	drone_position.x() = msg->pose.pose.position.x;
+	drone_position.y() = msg->pose.pose.position.y;
+	drone_position.z() = -msg->pose.pose.position.z;
 
-	drone_velocity.x() = msg->velocity[1];
-	drone_velocity.y() = msg->velocity[0];
-	drone_velocity.z() = -msg->velocity[2];
+	drone_velocity.x() = msg->twist.twist.linear.x;
+	drone_velocity.y() = msg->twist.twist.linear.y;
+	drone_velocity.z() = -msg->twist.twist.linear.z;
 }
 
 void DoubleIntegratorGovernor::px4StatusCallback(const px4_msgs::msg::VehicleControlMode::SharedPtr msg) {
@@ -347,19 +357,41 @@ void DoubleIntegratorGovernor::px4StatusCallback(const px4_msgs::msg::VehicleCon
 }
 
 void DoubleIntegratorGovernor::controlBarrierFunction() {
-	if (!is_log_gpis_trained)
+	auto request = std::make_shared<log_gpis::srv::QueryEstimate::Request>();
+	request->position[0] = reference_position.x();
+	request->position[1] = reference_position.y();
+	request->position[2] = reference_position.z();
+
+	auto future_and_id = client_log_gpis->async_send_request(request);
+	std::future_status status = future_and_id.wait_for(std::chrono::milliseconds(100));
+	if (status != std::future_status::ready) {
+		RCLCPP_WARN(this->get_logger(), "log_gpis server not available...");
 		return;
+	}
+	auto result = future_and_id.get();
 	
 	// Compute barrier functions needed derivatives
-	double h = log_gpis.evaluate(drone_position) - bf_safe_margin;;
+	double h = result->estimate - bf_safe_margin;
 	Eigen::RowVector<double, 6> gradient_h;
 	Eigen::Matrix<double, 6, 6> hessian_h;
 
 	gradient_h.setZero();
-	gradient_h.block(0, 0,  1, 3) = log_gpis.gradient(drone_position); 
+	gradient_h(0) = result->gradient_estimate[0];
+	gradient_h(1) = result->gradient_estimate[1];
+	gradient_h(2) = result->gradient_estimate[2];
 
 	hessian_h.setZero();
-	hessian_h.block(0, 0, 3, 3) = log_gpis.hessian(drone_position);
+	hessian_h(0, 0) = result->hessian_estimate[0];
+	hessian_h(0, 1) = result->hessian_estimate[1];
+	hessian_h(0, 2) = result->hessian_estimate[2];
+
+	hessian_h(1, 0) = result->hessian_estimate[3];
+	hessian_h(1, 1) = result->hessian_estimate[4];
+	hessian_h(1, 2) = result->hessian_estimate[5];
+
+	hessian_h(2, 0) = result->hessian_estimate[6];
+	hessian_h(2, 1) = result->hessian_estimate[7];
+	hessian_h(2, 2) = result->hessian_estimate[8];
 
 	// Compute lie derivatives
 	Eigen::Vector<double, 6> integrator_state;
@@ -447,100 +479,18 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	setpoint_msg.acceleration[2] = -setpoint_acceleration.z();
 
 	offboard_publisher->publish(offboard_msg);
-	// setpoint_publisher->publish(setpoint_msg);
-}
-
-void DoubleIntegratorGovernor::addGroundSphereCylinder() {
-		// Add ground
-		for (double x = -5.0; x < 5.1; x += 0.5) {
-			for (double y = -5.0; y < 5.1; y += 0.5) {
-				Eigen::Vector3d point(x, y, -0.5);
-				log_gpis.add_sample(point);
-			}
-		}
-
-		// Add Box 1
-		for (double z = 0.0; z < 1.1; z += 0.2) {
-			for (double s = 0.0; s < 2.0*4.0 + 2.0*2.0 + 0.1; s+=0.2) {
-				if (s < 4.0) {
-					Eigen::Vector3d point(-1.0 - s, -3.0, z);
-					log_gpis.add_sample(point);
-				} else if (s < 6.0) {
-					Eigen::Vector3d point(-5.0, -3.0 - (s - 4.0), z);
-					log_gpis.add_sample(point);
-				} else if (s < 10.0) {
-					Eigen::Vector3d point(-5.0 + (s - 6.0), -5.0, z);
-					log_gpis.add_sample(point);
-				} else {
-					Eigen::Vector3d point(-3.0, -5.0 + (s - 10.0), z);
-					log_gpis.add_sample(point);
-				}
-			}
-		}
-
-		// Add Sphere 1
-		Eigen::Vector3d sphere_center(3.0, -3.0, 1.0);
-		double sphere_radius = 1.0;
-		for (double psi = 0.0; psi < M_PI+0.1; psi += 0.2){
-			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
-				Eigen::Vector3d point(sin(psi) * cos(theta),
-				                      sin(psi) * sin(theta),
-				                      cos(psi)
-				                     );
-				point = sphere_center + sphere_radius * point;
-				log_gpis.add_sample(point);
-			}
-		}
-		
-		// Add Cylinder 1
-		Eigen::Vector3d cylinder_center_ground(4.0, 4.0, 0.0);
-		double cylinder_radius = 1.0;
-		for (double z = 0.0; z < 3.1; z += 0.2){
-			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
-				Eigen::Vector3d point(cylinder_radius * cos(theta), 
-				                      cylinder_radius * sin(theta), 
-				                      z);
-				point = cylinder_center_ground + cylinder_radius * point;
-				log_gpis.add_sample(point);
-			}
-		}
-
-		// Add Cylinder 2
-		cylinder_center_ground = Eigen::Vector3d(-3.0, 2.0, 0.0);
-		cylinder_radius = 1.0;
-		for (double z = 0.0; z < 3.1; z += 0.2){
-			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
-				Eigen::Vector3d point(cylinder_radius * cos(theta), 
-				                      cylinder_radius * sin(theta), 
-				                      z);
-				point = cylinder_center_ground + cylinder_radius * point;
-				log_gpis.add_sample(point);
-			}
-		}
- 
-		// Add Cylinder 3
-		cylinder_center_ground = Eigen::Vector3d(-3.0, -2.0, 0.0);
-		cylinder_radius = 0.5;
-		for (double z = 0.0; z < 3.1; z += 0.2){
-			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
-				Eigen::Vector3d point(cylinder_radius * cos(theta), 
-				                      cylinder_radius * sin(theta), 
-				                      z);
-				point = cylinder_center_ground + cylinder_radius * point;
-				log_gpis.add_sample(point);
-			}
-		}
-
-		RCLCPP_INFO(this->get_logger(), "Training...");
-		log_gpis.train();
-		is_log_gpis_trained = true;
-		RCLCPP_INFO(this->get_logger(), "Done!");
+	setpoint_publisher->publish(setpoint_msg);
 }
 
 // MAIN
 int main(int argc, char** argv){
 	rclcpp::init(argc, argv);
-	rclcpp::spin(std::make_shared<DoubleIntegratorGovernor>());
+
+	rclcpp::Node::SharedPtr node_governor = std::make_shared<DoubleIntegratorGovernor>();
+	rclcpp::executors::MultiThreadedExecutor executor;
+	executor.add_node(node_governor);
+	executor.spin();
+
 	rclcpp::shutdown();
 	return 0;
 }

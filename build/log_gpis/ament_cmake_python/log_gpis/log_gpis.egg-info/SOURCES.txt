@@ -1,8 +1,0 @@
-setup.py
-log_gpis/__init__.py
-log_gpis.egg-info/PKG-INFO
-log_gpis.egg-info/SOURCES.txt
-log_gpis.egg-info/dependency_links.txt
-log_gpis.egg-info/top_level.txt
-log_gpis/srv/__init__.py
-log_gpis/srv/_query_estimate.py

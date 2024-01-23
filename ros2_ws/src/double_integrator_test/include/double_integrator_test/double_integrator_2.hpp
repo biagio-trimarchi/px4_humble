@@ -12,6 +12,7 @@
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <nav_msgs/msg/odometry.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 
@@ -28,6 +29,7 @@
 #include <double_integrator_test/bezier_utilities.hpp>
 #include <double_integrator_test/trajectory.hpp>
 #include <double_integrator_test/logGPIS.hpp>
+#include <log_gpis/srv/query_estimate.hpp>
 
 // CLASSES
 class DoubleIntegratorGovernor : public rclcpp::Node {
@@ -43,12 +45,11 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		void arm();
 		void disarm();
 		void stateMachine();
-		void actionCallback(const std_msgs::msg::Empty msg);
-		void odometryCallback(const px4_msgs::msg::VehicleOdometry::SharedPtr msg);
+		void actionCallback(const std_msgs::msg::Empty::SharedPtr msg);
+		void odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
 		void px4StatusCallback(const px4_msgs::msg::VehicleControlMode::SharedPtr msg);
 		void controlBarrierFunction();
 		void dynamicsCallback();
-		void addGroundSphereCylinder();
 
 		// VARIABLES
 		Eigen::Vector3d drone_position;
@@ -75,11 +76,6 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		int qpOASES_constraints_number;
 		int qpOASES_nWSR;
 
-		LogGPIS log_gpis;
-		double gp_lambda_whittle;
-		double gp_resolution;
-		double gp_error_variance;
-		bool is_log_gpis_trained;
 		double bf_classK_gain_1;
 		double bf_classK_gain_2;
 		double bf_gain_lie_0_kh;
@@ -109,13 +105,17 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		bool follow_trajectory;
 
 		// ROS2 VARIABLES
+		// Callback groups
+		rclcpp::CallbackGroup::SharedPtr callback_group_client;
+		rclcpp::CallbackGroup::SharedPtr callback_group_dynamic;
+		
 		// Timers
 		rclcpp::TimerBase::SharedPtr debug_timer;
 		rclcpp::TimerBase::SharedPtr dynamics_timer;
 		rclcpp::TimerBase::SharedPtr state_machine_timer;
 
 		// Subscriptions
-		rclcpp::Subscription<px4_msgs::msg::VehicleOdometry>::SharedPtr odometry_subscriber;
+		rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber;
 		rclcpp::Subscription<std_msgs::msg::Empty>::SharedPtr action_subscriber;
 		rclcpp::Subscription<px4_msgs::msg::VehicleControlMode>::SharedPtr vehicle_state_subscriber;
 
@@ -125,6 +125,9 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr trajectory_visualizer_publisher;
 		rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr setpoint_visualizer_publisher;
 		rclcpp::Publisher<px4_msgs::msg::VehicleCommand>::SharedPtr vehicle_command_publisher;
+
+		// Services
+		rclcpp::Client<log_gpis::srv::QueryEstimate>::SharedPtr client_log_gpis;
 
 		// TF2
 		std::shared_ptr<tf2_ros::TransformBroadcaster> tf2_broadcaster; 

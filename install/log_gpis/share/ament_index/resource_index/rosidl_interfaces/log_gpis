@@ -1,4 +1,0 @@
-srv/QueryEstimate.idl
-srv/QueryEstimate.srv
-srv/QueryEstimate_Request.msg
-srv/QueryEstimate_Response.msg

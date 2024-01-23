@@ -13,6 +13,8 @@ find_package(tf2_ros REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(px4_msgs REQUIRED)
+find_package(px4_ros_com REQUIRED)
 find_package(log_gpis REQUIRED)
 find_package(Eigen3 REQUIRED)
 
@@ -28,8 +30,8 @@ target_link_libraries(gazebo_manager log_gpis::logGPIS world_utilities)
 ament_target_dependencies(gazebo_manager 
 	rclcpp geometry_msgs visualization_msgs 
 	nav_msgs tf2 tf2_ros 
+	px4_msgs px4_ros_com
 	Eigen3 log_gpis)
-
 
 install(TARGETS gazebo_manager DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY data DESTINATION share/${PROJECT_NAME})

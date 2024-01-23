@@ -12,10 +12,12 @@ find_package(std_msgs REQUIRED)
 find_package(px4_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(log_gpis REQUIRED)
 
 include_directories(
 	${PROJECT_SOURCE_DIR}/include
@@ -25,13 +27,18 @@ include_directories(
 
 add_executable(governor_node src/double_integrator.cpp src/bezier_utilities.cpp src/trajectory.cpp src/logGPIS.cpp src/gp_matern32)
 ament_target_dependencies(governor_node
-	rclcpp px4_msgs Eigen3 std_msgs visualization_msgs geometry_msgs tf2 tf2_ros
+	rclcpp px4_msgs Eigen3 
+	std_msgs visualization_msgs geometry_msgs 
+	tf2 tf2_ros
 )
 target_link_libraries(governor_node qpOASES)
 
 add_executable(governor_node_2 src/double_integrator_2.cpp src/bezier_utilities.cpp src/trajectory.cpp src/logGPIS.cpp src/gp_matern32)
 ament_target_dependencies(governor_node_2
-	rclcpp px4_msgs Eigen3 std_msgs visualization_msgs geometry_msgs tf2 tf2_ros
+	rclcpp px4_msgs Eigen3 
+	std_msgs visualization_msgs geometry_msgs 
+	nav_msgs tf2 tf2_ros 
+	log_gpis
 )
 target_link_libraries(governor_node_2 qpOASES)
 

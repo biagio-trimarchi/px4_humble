@@ -7,6 +7,8 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <visualization_msgs/msg/marker.hpp>
+#include <px4_msgs/msg/vehicle_odometry.hpp>
+#include <px4_ros_com/frame_transforms.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
@@ -56,6 +58,9 @@ class GazeboManager : public rclcpp::Node {
 
 		visualization_msgs::msg::Marker debug_message;
 
+		// Callback groups
+		rclcpp::CallbackGroup::SharedPtr callback_group_visualization;
+		
 		// Timers
 		rclcpp::TimerBase::SharedPtr timer_visualization;
 
@@ -65,6 +70,7 @@ class GazeboManager : public rclcpp::Node {
 		// Publishers
 		rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr publisher_drone_odometry;
 		rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr publisher_visualization;
+		rclcpp::Publisher<px4_msgs::msg::VehicleOdometry>::SharedPtr publisher_px4_odometry;
 
 		// Services
 		rclcpp::Service<log_gpis::srv::QueryEstimate>::SharedPtr service_logGPIS;

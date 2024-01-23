@@ -1,4 +1,0 @@
-source;share/log_gpis/environment/ament_prefix_path.sh
-source;share/log_gpis/environment/library_path.sh
-source;share/log_gpis/environment/path.sh
-source;share/log_gpis/environment/pythonpath.sh
