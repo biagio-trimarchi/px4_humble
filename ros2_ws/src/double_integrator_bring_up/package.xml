@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>double_integrator_bring_up</name>
+  <version>0.0.0</version>
+  <description>Bring up for log_gpis test with double integrator</description>
+  <maintainer email="biagio.trimarchi@unibo.it">Biagio Trimarchi</maintainer>
+  <license>None</license>
+
+	<buildtool_depend>ament_cmake</buildtool_depend>
+
+	<depend>double_integrator_test</depend>
+	<depend>simulation_manager</depend>
+	<depend>ros_gz_bridge</depend>
+	<depend>rviz2</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

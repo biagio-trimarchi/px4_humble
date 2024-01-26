@@ -162,6 +162,7 @@ void GazeboManager::odometryCallback(nav_msgs::msg::Odometry::SharedPtr msg) {
 	odometry_msg_px4.angular_velocity[1] = drone_angular_velocity_px4.y();
 	odometry_msg_px4.angular_velocity[2] = drone_angular_velocity_px4.z();
 
+	publisher_px4_odometry->publish(odometry_msg_px4);
 }
 
 void GazeboManager::logGPISCallback(const std::shared_ptr<log_gpis::srv::QueryEstimate::Request> request,
