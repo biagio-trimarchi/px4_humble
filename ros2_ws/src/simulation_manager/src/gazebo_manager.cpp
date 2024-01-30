@@ -124,11 +124,11 @@ void GazeboManager::odometryCallback(nav_msgs::msg::Odometry::SharedPtr msg) {
 
 	Eigen::Quaterniond drone_orientation_px4 = px4_ros_com::frame_transforms::ros_to_px4_orientation(
 		Eigen::Quaternion(
-			msg->pose.pose.orientation.w,
-			msg->pose.pose.orientation.x,
-			msg->pose.pose.orientation.y,
-			msg->pose.pose.orientation.z
-		)
+			-msg->pose.pose.orientation.w,
+			-msg->pose.pose.orientation.x,
+			-msg->pose.pose.orientation.y,
+			-msg->pose.pose.orientation.z
+		) 
 	);
 
 	Eigen::Vector3d drone_angular_velocity_px4 = px4_ros_com::frame_transforms::enu_to_ned_local_frame(
@@ -141,9 +141,10 @@ void GazeboManager::odometryCallback(nav_msgs::msg::Odometry::SharedPtr msg) {
 
 	auto odometry_msg_px4 = px4_msgs::msg::VehicleOdometry();
 	odometry_msg_px4.timestamp = this->get_clock()->now().nanoseconds() / 1000;
+	odometry_msg_px4.timestamp_sample = this->get_clock()->now().nanoseconds() / 1000;
 
-	odometry_msg_px4.pose_frame = px4_msgs::msg::VehicleOdometry::POSE_FRAME_FRD;
-	odometry_msg_px4.velocity_frame = px4_msgs::msg::VehicleOdometry::POSE_FRAME_FRD;
+	odometry_msg_px4.pose_frame = px4_msgs::msg::VehicleOdometry::POSE_FRAME_NED;
+	odometry_msg_px4.velocity_frame = px4_msgs::msg::VehicleOdometry::POSE_FRAME_NED;
 
 	odometry_msg_px4.position[0] = drone_position_px4.x();
 	odometry_msg_px4.position[1] = drone_position_px4.y();

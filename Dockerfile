@@ -51,6 +51,7 @@ RUN sudo apt install vim -y
 # Other useful stuff
 RUN sudo apt install curl -y
 RUN sudo apt install wget -y
+RUN sudo apt install xterm -y
 
 # Install python depencies
 RUN sudo apt install python3-pip -y
@@ -139,8 +140,31 @@ RUN make && sudo make install
 WORKDIR /home/$USERNAME/
 RUN sudo rm -r opencv
 
+# Install ROS Humble - Gazebo Garden Bridge
+ENV GZ_VERSION=garden
+sudo apt install ros-humble-actuator-msgs
+sudo apt install ros-humble-vision-msgs
+sudo apt install libgflags-dev
+WORKDIR /home/$USERNAME/
+RUN mkdir Gazebo/
+WORKDIR /home/$USERNAME/Gazebo
+RUN git clone -b humble https://github.com/gazebosim/ros_gz.git
+WORKDIR /home/$USERNAME/Gazebo/ros_gz
+RUN colcon build
+
+# Install qpOASES (C++ QP solver)
+WORKDIR /home/$USERNAME/
+git clone https://github.com/coin-or/qpOASES.git
+WORKDIR /home/$USERNAME/qpOASES
+RUN mkdir build
+WORKDIR /home/$USERNAME/qpOASES/build
+RUN cmake .. && make && sudo make install
+WORKDIR /home/$USERNAME/
+RUN sudo rm -r qpOASES
+
 ### Final setup
 WORKDIR /home/$USERNAME
-RUN echo "\n#Source ROS\nsource /opt/ros/${ROS_DISTRO}/setup.bash" >> .bashrc
-RUN echo "\n#Source PX4_ROS interface\nsource PX4/px4_ros_interface/install/setup.bash" >> .bashrc
-RUN echo "\n\n#Fix display\nexport DISPLAY=:0" >> .bashrc
+RUN printf "\n#Source ROS\nsource /opt/ros/${ROS_DISTRO}/setup.bash" >> .bashrc
+RUN printf "\n#Source PX4 ROS interface\nsource ~/PX4/px4_ros_interface/install/setup.bash" >> .bashrc
+RUN printf "\n#Source Gazebo ROS interface\nsource ~/Gazebo/ros_gz/install/setup.bash" >> .bashrc
+RUN printf "\n\n#Fix display\nexport DISPLAY=:0" >> .bashrc

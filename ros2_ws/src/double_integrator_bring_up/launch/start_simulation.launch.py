@@ -6,7 +6,7 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     ### Rviz
-        rviz_configuration = get_package_share_directory("double_integrator_bring_up") + "/rviz/log_test.rviz"
+        rviz_configuration = get_package_share_directory("double_integrator_bring_up") + "/rviz/log_gpis_test.rviz"
 
         ### Create LaunchDescription
         launch_description = LaunchDescription()
@@ -105,6 +105,9 @@ def generate_launch_description():
             parameters = [
                 {"use_sim_time" : use_sim_time}
                 ],
+            remappings = [
+                ("/odometry", topic_drone_odometry)
+                ],
             prefix = ["xterm -hold -e"]
             )
                      )
@@ -145,10 +148,22 @@ def generate_launch_description():
                      )
 
         nodes.append(Node(
+            package = "ros_gz_bridge",
+            executable = "parameter_bridge",
+            namespace = log_gpis_namespace,
+            arguments = ["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"],
+            prefix = ["xterm -hold -e"]
+            )
+                     )
+
+        nodes.append(Node(
             package = "rviz2",
             executable = "rviz2",
             name = "rviz2",
-            arguments = [rviz_configuration]
+            parameters = [
+                {"use_sim_time" : use_sim_time}
+                ],
+            arguments = ["-d " + rviz_configuration]
             )
                      )
 

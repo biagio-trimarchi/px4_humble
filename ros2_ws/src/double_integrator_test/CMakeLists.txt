@@ -13,7 +13,6 @@ find_package(px4_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
-find_package(gazebo_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -42,11 +41,6 @@ ament_target_dependencies(governor_node_2
 )
 target_link_libraries(governor_node_2 qpOASES)
 
-add_executable(gazebo_pose_publisher src/model_state_publisher.cpp)
-ament_target_dependencies(gazebo_pose_publisher
-	rclcpp gazebo_msgs
-)
-
 add_executable(visualization_test src/sphere_and_cylinder_test.cpp src/logGPIS.cpp src/gp_matern32.cpp)
 ament_target_dependencies(visualization_test 
 	rclcpp Eigen3 visualization_msgs geometry_msgs
@@ -54,7 +48,6 @@ ament_target_dependencies(visualization_test
 
 install( TARGETS governor_node DESTINATION lib/${PROJECT_NAME})
 install( TARGETS governor_node_2 DESTINATION lib/${PROJECT_NAME})
-install( TARGETS gazebo_pose_publisher DESTINATION lib/${PROJECT_NAME})
 install( TARGETS visualization_test DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)

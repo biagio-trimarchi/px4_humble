@@ -242,11 +242,12 @@ void DoubleIntegratorGovernor::debugCallback() {
 	visualization_msgs::msg::Marker msg;
 	msg.header.frame_id = "map";
 	msg.header.stamp = this->get_clock()->now();
+	msg.id = 1;
 	msg.type = visualization_msgs::msg::Marker::SPHERE;
 	msg.action = visualization_msgs::msg::Marker::ADD;
-	msg.pose.position.x = reference_position.x();
-	msg.pose.position.y = reference_position.y();
-	msg.pose.position.z = reference_position.z();
+	msg.pose.position.x = drone_position.x();
+	msg.pose.position.y = drone_position.y();
+	msg.pose.position.z = drone_position.z();
 	msg.pose.orientation.w = 1.0;
 	msg.pose.orientation.x = 0.0;
 	msg.pose.orientation.y = 0.0;
@@ -254,9 +255,9 @@ void DoubleIntegratorGovernor::debugCallback() {
 	msg.scale.x = 0.3;
 	msg.scale.y = 0.3;
 	msg.scale.z = 0.3;
-	msg.color.r = 1.0;
+	msg.color.r = 0.0;
 	msg.color.g = 0.0;
-	msg.color.b = 0.0;
+	msg.color.b = 1.0;
 	msg.color.a = 1.0;
 	setpoint_visualizer_publisher->publish(msg);
 }
@@ -344,11 +345,11 @@ void DoubleIntegratorGovernor::odometryCallback(const nav_msgs::msg::Odometry::S
 	// Read odometry and update agent position and acceleration
 	drone_position.x() = msg->pose.pose.position.x;
 	drone_position.y() = msg->pose.pose.position.y;
-	drone_position.z() = -msg->pose.pose.position.z;
+	drone_position.z() = msg->pose.pose.position.z;
 
 	drone_velocity.x() = msg->twist.twist.linear.x;
 	drone_velocity.y() = msg->twist.twist.linear.y;
-	drone_velocity.z() = -msg->twist.twist.linear.z;
+	drone_velocity.z() = msg->twist.twist.linear.z;
 }
 
 void DoubleIntegratorGovernor::px4StatusCallback(const px4_msgs::msg::VehicleControlMode::SharedPtr msg) {
@@ -466,17 +467,21 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	setpoint_msg.velocity[1] = std::numeric_limits<double>::quiet_NaN();
 	setpoint_msg.velocity[2] = std::numeric_limits<double>::quiet_NaN();
 
+	setpoint_msg.acceleration[0] = std::numeric_limits<double>::quiet_NaN();
+	setpoint_msg.acceleration[1] = std::numeric_limits<double>::quiet_NaN();
+	setpoint_msg.acceleration[2] = std::numeric_limits<double>::quiet_NaN();
+
 	setpoint_msg.position[0] = reference_position.y();
 	setpoint_msg.position[1] = reference_position.x();
 	setpoint_msg.position[2] = -reference_position.z();
 
-	setpoint_msg.velocity[0] = reference_velocity.y();
-	setpoint_msg.velocity[1] = reference_velocity.x();
-	setpoint_msg.velocity[2] = -reference_velocity.z();
+	// setpoint_msg.velocity[0] = reference_velocity.y();
+	// setpoint_msg.velocity[1] = reference_velocity.x();
+	// setpoint_msg.velocity[2] = -reference_velocity.z();
 
-	setpoint_msg.acceleration[0] = setpoint_acceleration.y();
-	setpoint_msg.acceleration[1] = setpoint_acceleration.x();
-	setpoint_msg.acceleration[2] = -setpoint_acceleration.z();
+	// setpoint_msg.acceleration[0] = setpoint_acceleration.y();
+	// setpoint_msg.acceleration[1] = setpoint_acceleration.x();
+	// setpoint_msg.acceleration[2] = -setpoint_acceleration.z();
 
 	offboard_publisher->publish(offboard_msg);
 	setpoint_publisher->publish(setpoint_msg);
