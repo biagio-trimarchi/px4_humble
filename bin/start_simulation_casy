@@ -1,0 +1,4 @@
+#!/bin/bash
+cd ~/PX4/PX4-Autopilot/
+xterm -e "MicroXRCEAgent udp4 -p 8888" &
+PX4_GZ_MODEL_POSE="-1.5, -1.5, 1.5, 0, 0, 0" make px4_sitl gz_x500_vision_casy_scenario_1

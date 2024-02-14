@@ -10,6 +10,7 @@ GazeboManager::GazeboManager() : Node("gazebo_manager") {
 	this->declare_parameter("tf_odometry_name", "odometry");
 	this->declare_parameter("tf_drone_name", "drone");
 	this->declare_parameter("world_name", "lgpis_test_1");
+	// this->declare_parameter("world_name", "casy_scenario_1");
 
 	this->declare_parameter("gp_lambda_whittle", 40.0);
 	this->declare_parameter("gp_resolution", 0.1);
@@ -91,6 +92,7 @@ void GazeboManager::initializeWorld() {
 	std::string path_data_directory = ament_index_cpp::get_package_share_directory("simulation_manager") + "/data/";
 	if (load_world) {
 		loadWorld(world_name, path_data_directory, log_gpis);
+		RCLCPP_INFO(this->get_logger(), "World loaded!");
 		return;
 	} 
 
@@ -98,6 +100,7 @@ void GazeboManager::initializeWorld() {
 
 	if (save_world) {
 		saveWorld(world_name, path_data_directory, log_gpis);
+		RCLCPP_INFO(this->get_logger(), "World saved!");
 	}
 }
 

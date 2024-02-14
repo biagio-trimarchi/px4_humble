@@ -93,7 +93,10 @@ void loadMatrix(std::string filename, Eigen::MatrixXd& matrix) {
 void buildWorld(std::string world_name, LogGPIS& lgpis) {
 	if (world_name == "lgpis_test_1") {
 		buildWorld_lgpis_test_1(lgpis);	
-	} else {
+	} else if (world_name == "casy_scenario_1") {
+		buildWorld_casy_scenario_1(lgpis);
+	} 
+	else {
 		std::cout << "[ERROR] : Unknown world name";
 	}
 }
@@ -175,6 +178,102 @@ void buildWorld_lgpis_test_1(LogGPIS& log_gpis) {
 		// Add Cylinder 3
 		cylinder_center_ground = Eigen::Vector3d(-3.0, -2.0, 0.0);
 		cylinder_radius = 0.5;
+		for (double z = 0.0; z < 3.1; z += 0.2){
+			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
+				Eigen::Vector3d point(cylinder_radius * cos(theta), 
+				                      cylinder_radius * sin(theta), 
+				                      z);
+				point = cylinder_center_ground + point;
+				log_gpis.add_sample(point);
+			}
+		}
+
+		std::cout <<  "LogGPIS training..." << std::endl;
+		log_gpis.train();
+		std::cout <<  "LogGPIS training finished!" << std::endl;
+}
+
+void buildWorld_casy_scenario_1(LogGPIS& log_gpis) {
+		// Add ground
+		for (double x = -3.5; x < 3.6; x += 0.5) {
+			for (double y = -3.5; y < 3.6; y += 0.5) {
+				Eigen::Vector3d point(x, y, -0.5);
+				log_gpis.add_sample(point);
+			}
+		}
+
+		// Add roof
+		for (double x = -3.5; x < 3.6; x += 0.5) {
+			for (double y = -3.5; y < 3.6; y += 0.5) {
+				Eigen::Vector3d point(x, y, 3.0);
+				log_gpis.add_sample(point);
+			}
+		}
+
+		// Add north wall
+		for (double y = -3.5; y < 3.6; y += 0.5) {
+			for (double z = -0.5; z < 3.6; z += 0.5) {
+				Eigen::Vector3d point(2.5, y, z);
+				log_gpis.add_sample(point);
+			}
+		}
+
+		// Add south wall
+		for (double y = -3.5; y < 3.6; y += 0.5) {
+			for (double z = -0.5; z < 3.6; z += 0.5) {
+				Eigen::Vector3d point(-2.5, y, z);
+				log_gpis.add_sample(point);
+			}
+		}
+
+		// Add east wall
+		for (double x = -3.5; x < 3.6; x += 0.5) {
+			for (double z = -0.5; z < 3.6; z += 0.5) {
+				Eigen::Vector3d point(x, 2.5, z);
+				log_gpis.add_sample(point);
+			}
+		}
+
+		// Add east wall
+		for (double x = -3.5; x < 3.6; x += 0.5) {
+			for (double z = -0.5; z < 3.6; z += 0.5) {
+				Eigen::Vector3d point(x, -2.5, z);
+				log_gpis.add_sample(point);
+			}
+		}
+
+		// Add Sphere 1
+		Eigen::Vector3d sphere_center(2.0, -2.0, 0.5);
+		double sphere_radius = 0.5;
+		for (double psi = 0.0; psi < M_PI+0.1; psi += 0.2){
+			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
+				Eigen::Vector3d point(sin(psi) * cos(theta),
+				                      sin(psi) * sin(theta),
+				                      cos(psi)
+				                     );
+				point = sphere_center + sphere_radius * point;
+				log_gpis.add_sample(point);
+			}
+		}
+
+		// Add Sphere 2
+		sphere_center = Eigen::Vector3d(2.0, 0.0, 0.5);
+		sphere_radius = 0.5;
+		for (double psi = 0.0; psi < M_PI+0.1; psi += 0.2){
+			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
+				Eigen::Vector3d point(sin(psi) * cos(theta),
+				                      sin(psi) * sin(theta),
+				                      cos(psi)
+				                     );
+				point = sphere_center + sphere_radius * point;
+				log_gpis.add_sample(point);
+			}
+		}
+
+
+		// Add Cylinder 1
+		Eigen::Vector3d cylinder_center_ground(0.0, 0.0, 0.0);
+		double cylinder_radius = 0.75;
 		for (double z = 0.0; z < 3.1; z += 0.2){
 			for (double theta = 0.0; theta < 2*M_PI; theta += 0.2){
 				Eigen::Vector3d point(cylinder_radius * cos(theta), 
