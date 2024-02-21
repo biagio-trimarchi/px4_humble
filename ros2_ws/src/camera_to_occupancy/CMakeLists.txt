@@ -23,8 +23,13 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions($(PCL_DEFINITIONS))
 
 add_executable(camera_to_occupancy src/camera_to_occupancy.cpp)
+add_executable(camera_test src/camera_test.cpp)
 
 ament_target_dependencies(camera_to_occupancy
+	rclcpp nav_msgs sensor_msgs Eigen3 PCL pcl_conversions 
+)
+
+ament_target_dependencies(camera_test
 	rclcpp nav_msgs sensor_msgs Eigen3 PCL pcl_conversions 
 )
 
@@ -32,7 +37,15 @@ target_link_libraries(camera_to_occupancy
 	${PCL_LIBRARIES}
 )
 
+target_link_libraries(camera_test
+	${PCL_LIBRARIES}
+)
+
 INSTALL(TARGETS camera_to_occupancy
+        DESTINATION lib/${PROJECT_NAME}
+)
+
+INSTALL(TARGETS camera_test
         DESTINATION lib/${PROJECT_NAME}
 )
 

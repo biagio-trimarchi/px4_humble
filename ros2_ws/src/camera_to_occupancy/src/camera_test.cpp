@@ -1,10 +1,11 @@
-#include <camera_to_occupancy/camera_to_occupancy.hpp>
+#include <camera_to_occupancy/camera_test.hpp>
 
 CameraToOccupancy::CameraToOccupancy() : Node("CameraToOccupancy") {
 	// Set parameters
 	this->declare_parameter("pointcloud_filter_min_distance", 0.5);
 	this->declare_parameter("pointcloud_filter_max_distance", 2.5);
 	this->declare_parameter("pointcloud_freespace_resolution", 0.1);
+	this->declare_parameter("pointcloud_camera_fov", M_PI/4.0);
 	this->declare_parameter("camera_orientation", std::vector<double>{1.0, 0.0, 0.0, 0.0});
 	this->declare_parameter("map_width", 10.0);
 	this->declare_parameter("map_height", 12.0);
@@ -17,6 +18,7 @@ CameraToOccupancy::CameraToOccupancy() : Node("CameraToOccupancy") {
 	this->get_parameter("pointcloud_filter_min_distance", pointcloud_filter_min_distance);
 	this->get_parameter("pointcloud_filter_max_distance", pointcloud_filter_max_distance);
 	this->get_parameter("pointcloud_freespace_resolution", pointcloud_freespace_resolution);
+	this->get_parameter("pointcloud_camera_fov", pointcloud_camera_fov);
 	rclcpp::Parameter param_camera_orientation = this->get_parameter("camera_orientation");
 	camera_orientation = Eigen::Quaterniond(
 	  (param_camera_orientation.as_double_array())[0], // w
@@ -43,10 +45,10 @@ CameraToOccupancy::CameraToOccupancy() : Node("CameraToOccupancy") {
 	qos_reliable_transient_local.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
 	
 	// Subscriptions
-	subscriber_pointcloud.subscribe(this, "/in_cloud", rmw_qos_profile_sensor_data);
-	subscriber_odometry.subscribe(this, "/in_odometry", rmw_qos_profile_sensor_data);
-	sync_odom_cloud = std::make_shared<SynchronizerOdomCloud>(SyncPolicyOdomCloud(10), subscriber_pointcloud, subscriber_odometry);
-	sync_odom_cloud->registerCallback(std::bind(&CameraToOccupancy::pointcloudCallback, this, std::placeholders::_1, std::placeholders::_2));
+	subscriber_pointcloud = this->create_subscription<sensor_msgs::msg::PointCloud2>(
+	  "/in_cloud", qos_sensor_data,
+	  std::bind(&CameraToOccupancy::pointcloudCallback, this, std::placeholders::_1)
+	  );
 
 	// Publishers
 	publisher_occupancy_grid = this->create_publisher<nav_msgs::msg::OccupancyGrid>(
@@ -55,6 +57,10 @@ CameraToOccupancy::CameraToOccupancy() : Node("CameraToOccupancy") {
 
 	publisher_debug_pointcloud = this->create_publisher<sensor_msgs::msg::PointCloud2>(
 	  "/out_debug_pointcloud", qos_reliable_transient_local
+	);
+
+	publisher_debug_empty_pointcloud = this->create_publisher<sensor_msgs::msg::PointCloud2>(
+	  "/out_debug_empty_pointcloud", qos_reliable_transient_local
 	);
 }
 
@@ -83,7 +89,7 @@ Eigen::Quaterniond CameraToOccupancy::yawRotationQuaternion(Eigen::Quaterniond q
 	// Can be found at https://core.ac.uk/download/pdf/76383736.pdf
 	Eigen::Matrix3d rotation_matrix = q_orientation.toRotationMatrix();
 
-	double yaw = std::atan2(rotation_matrix(0, 1), rotation_matrix(1, 1));
+	double yaw = std::atan2(-rotation_matrix(0, 1), rotation_matrix(1, 1));
 
 	Eigen::AngleAxisd yaw_axis_rotation(yaw, Eigen::Vector3d::UnitZ());
 
@@ -91,17 +97,17 @@ Eigen::Quaterniond CameraToOccupancy::yawRotationQuaternion(Eigen::Quaterniond q
 	return q_yaw_rotation;
 }
 
-void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr& msg_pointcloud, const nav_msgs::msg::Odometry::ConstSharedPtr& msg_odometry) {
+void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::SharedPtr msg_pointcloud) {
 	RCLCPP_INFO(this->get_logger(), "Reading odometry message...");
 	// Read odometry
-	drone_position.x() = msg_odometry->pose.pose.position.x;
-	drone_position.y() = msg_odometry->pose.pose.position.y;
-	drone_position.z() = msg_odometry->pose.pose.position.z;
+	drone_position.x() = 0.0;
+	drone_position.y() = 0.0;
+	drone_position.z() = 0.0;
 
-	drone_orientation.x() = msg_odometry->pose.pose.orientation.x;
-	drone_orientation.y() = msg_odometry->pose.pose.orientation.y;
-	drone_orientation.z() = msg_odometry->pose.pose.orientation.z;
-	drone_orientation.w() = msg_odometry->pose.pose.orientation.w;
+	drone_orientation.x() = 0.0;
+	drone_orientation.y() = 0.0;
+	drone_orientation.z() = std::sin(M_PI/4);
+	drone_orientation.w() = std::cos(M_PI/4);
 
 	RCLCPP_INFO(this->get_logger(), "Preparing message...");
 	// Read point cloud from topic
@@ -119,11 +125,29 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 	box_filter.setFilterFieldName("y");
 	box_filter.filter(current_pointcloud);
 
+	// for (auto it = current_pointcloud.begin(); it != current_pointcloud.end();) {
+		// double distance = std::sqrt(
+		  // (it->x) * (it->x) + (it->y) * (it->y) + (it->z) * (it->z)
+				// );
+// 
+		// double cos_inclination_angle = (it->z) / distance;
+// 
+		// if (distance < pointcloud_filter_min_distance || distance > pointcloud_filter_max_distance) {
+			// // Filter based on distance
+			// it = current_pointcloud.erase(it);
+		// } else if (cos_inclination_angle < std::cos(pointcloud_camera_fov)) {
+			// // Filter based on cone of vision
+			// it = current_pointcloud.erase(it);
+		// } else {
+			// ++it;
+		// }
+	// }
+
 	// Mark free space using a pointcloud (use 
 	current_empty_space_pointcloud_2D.clear();
 	RCLCPP_INFO(this->get_logger(), "Creating empty cloud...");
 	for (float r = pointcloud_filter_min_distance; r <= pointcloud_filter_max_distance; r+=pointcloud_freespace_resolution) {
-		for (float theta = -M_PI/4.0; theta <= M_PI/4.0; theta+=0.1) {
+		for (float theta = -pointcloud_camera_fov; theta <= pointcloud_camera_fov; theta+=0.1) {
 			// Point to check
 			pcl::PointXYZ gridPoint;
 			gridPoint.x = r * std::cos(theta);
@@ -157,6 +181,12 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 	odom2freespace_pointcloud.translation() = drone_plane_position;
 	odom2freespace_pointcloud.linear() = yaw_orientation.toRotationMatrix();
 	pcl::transformPointCloud(current_empty_space_pointcloud_2D, current_empty_space_pointcloud_2D, odom2freespace_pointcloud);
+
+	sensor_msgs::msg::PointCloud2 debug_empty_pointcloud;
+	pcl::toROSMsg(current_empty_space_pointcloud_2D, debug_empty_pointcloud);
+	debug_empty_pointcloud.header.frame_id = this->get_parameter("frame_camera").as_string();
+	debug_empty_pointcloud.header.stamp = this->get_clock()->now();
+	publisher_debug_empty_pointcloud->publish(debug_empty_pointcloud);
 
 	// Update occupancy map
 	// Mark points as explored

@@ -2,6 +2,9 @@
 
 ViconToOdometry::ViconToOdometry() : Node("ViconToOdometry") {
 	// Set parameters
+	this->declare_parameter("offset_x", 0.0);
+	this->declare_parameter("offset_y", 0.0);
+	this->declare_parameter("offset_z", 0.0);
 	this->declare_parameter("tf_parent", "map");
 	this->declare_parameter("tf_child", "odom");
 
@@ -45,9 +48,9 @@ void ViconToOdometry::viconCallback(const vicon_receiver::msg::Position::SharedP
 
 	// Fill message
 	// Position and orientation
-	msg_odometry.pose.pose.position.x = msg_vicon->x_trans * 0.001;
-	msg_odometry.pose.pose.position.y = msg_vicon->y_trans * 0.001;
-	msg_odometry.pose.pose.position.z = msg_vicon->z_trans * 0.001;
+	msg_odometry.pose.pose.position.x = msg_vicon->x_trans * 0.001 + this->get_parameter("offset_x").as_double();
+	msg_odometry.pose.pose.position.y = msg_vicon->y_trans * 0.001 + this->get_parameter("offset_y").as_double();
+	msg_odometry.pose.pose.position.z = msg_vicon->z_trans * 0.001 + this->get_parameter("offset_z").as_double();
 
 	msg_odometry.pose.pose.orientation.x = msg_vicon->x_rot;
 	msg_odometry.pose.pose.orientation.y = msg_vicon->y_rot;
@@ -71,9 +74,9 @@ void ViconToOdometry::viconCallback(const vicon_receiver::msg::Position::SharedP
 	transform.header.frame_id = this->get_parameter("tf_parent").as_string();
 	transform.child_frame_id = this->get_parameter("tf_child").as_string();
 	
-	transform.transform.translation.x = msg_vicon->x_trans * 0.001;
-	transform.transform.translation.y = msg_vicon->y_trans * 0.001;
-	transform.transform.translation.z = msg_vicon->z_trans * 0.001;
+	transform.transform.translation.x = msg_vicon->x_trans * 0.001 + this->get_parameter("offset_x").as_double();
+	transform.transform.translation.y = msg_vicon->y_trans * 0.001 + this->get_parameter("offset_y").as_double();
+	transform.transform.translation.z = msg_vicon->z_trans * 0.001 + this->get_parameter("offset_z").as_double();
 
 	transform.transform.rotation.x = msg_vicon->x_rot;
 	transform.transform.rotation.y = msg_vicon->y_rot;

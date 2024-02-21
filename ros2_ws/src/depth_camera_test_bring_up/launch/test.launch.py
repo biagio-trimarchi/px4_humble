@@ -11,13 +11,28 @@ def generate_launch_description():
     ### Launch arguments
     launch_args = []
     launch_args.append(DeclareLaunchArgument(
+        "offset_x",
+        default_value="0.0"
+        )
+                       )
+    launch_args.append(DeclareLaunchArgument(
+        "offset_y",
+        default_value="0.0"
+        )
+                       )
+    launch_args.append(DeclareLaunchArgument(
+        "offset_z",
+        default_value="0.0"
+        )
+                       )
+    launch_args.append(DeclareLaunchArgument(
         "tf_parent",
         default_value="tf_map"
         )
                        )
     launch_args.append(DeclareLaunchArgument(
         "tf_child",
-        default_value="tf_agent"
+        default_value="camera_link"
         )
                        )
     launch_args.append(DeclareLaunchArgument(
@@ -52,18 +67,21 @@ def generate_launch_description():
                        )
     launch_args.append(DeclareLaunchArgument(
         "frame_map",
-        default_value="map"
+        default_value="tf_map"
         )
                        )
     launch_args.append(DeclareLaunchArgument(
         "frame_camera",
-        default_value="camera_link"
+        default_value="tf_map"
         )
                        )
 
     for arg in launch_args:
         launch_description.add_action(arg)
 
+    param_offset_x = LaunchConfiguration("offset_x")
+    param_offset_y = LaunchConfiguration("offset_y")
+    param_offset_z = LaunchConfiguration("offset_z")
     param_tf_parent = LaunchConfiguration("tf_parent")
     param_tf_child = LaunchConfiguration("tf_child")
     param_pointcloud_filter_min_distance = LaunchConfiguration("pointcloud_filter_min_distance")
@@ -90,6 +108,9 @@ def generate_launch_description():
         executable = "vicon_to_odometry",
         name = "odometry_converter",
         parameters = [
+            {"offset_x" : param_offset_x},
+            {"offset_y" : param_offset_y},
+            {"offset_z" : param_offset_z},
             {"tf_parent" : param_tf_parent},
             {"tf_child" : param_tf_child}
             ],
