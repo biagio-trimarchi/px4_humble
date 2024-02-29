@@ -42,7 +42,7 @@ def generate_launch_description():
                        )
     launch_args.append(DeclareLaunchArgument(
         "pointcloud_filter_max_distance",
-        default_value="2.5"
+        default_value="3.5"
         )
                        )
     launch_args.append(DeclareLaunchArgument(
@@ -73,6 +73,12 @@ def generate_launch_description():
     launch_args.append(DeclareLaunchArgument(
         "frame_camera",
         default_value="tf_map"
+        )
+                       )
+
+    launch_args.append(DeclareLaunchArgument(
+        "vicon_topic",
+        default_value="camera"
         )
                        )
 

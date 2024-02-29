@@ -17,12 +17,23 @@
 
 // Third Party Libraries
 #include <Eigen/Eigen>
+
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/common/transforms.h>
 #include <pcl/common/distances.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl/filters/statistical_outlier_removal.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/conditional_removal.h>
+#include <pcl/filters/extract_indices.h>
+#include <pcl/filters/project_inliers.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/segmentation/extract_clusters.h>
+#include <pcl/filters/conditional_removal.h>
 
 // Custom Libraries
 
@@ -36,13 +47,12 @@ class CameraToOccupancy : public rclcpp::Node {
 		// FUNCTIONS
 		void debugCallback();
 		void initializeOccupancyGrid();
-		Eigen::Quaterniond yawRotationQuaternion(Eigen::Quaterniond orientation);
+		double yawRotationQuaternion(Eigen::Quaterniond orientation);
 		void pointcloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr& msg_pointcloud, const nav_msgs::msg::Odometry::ConstSharedPtr& msg_odometry);
 	
 		// VARIABLES
 		// Pointcloud
-		pcl::PointCloud<pcl::PointXYZ> current_pointcloud;
-		pcl::PointCloud<pcl::PointXYZ> current_empty_space_pointcloud_2D;
+		pcl::PointCloud<pcl::PointXYZ>::Ptr current_pointcloud;
 		float pointcloud_filter_min_distance;
 		float pointcloud_filter_max_distance;
 		float pointcloud_freespace_resolution;

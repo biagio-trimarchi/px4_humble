@@ -18,8 +18,8 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	reference_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
 	reference_acceleration = Eigen::Vector3d(0.0, 0.0, 0.0);
 
-	PD_position_gain = 5.5;
-	PD_velocity_gain = 2.3;
+	PD_position_gain = 1.5;
+	PD_velocity_gain = 0.5;
 
 	qpOASES_constraints_number = 1;
 	qpOASES_solver = qpOASES::QProblem(3, qpOASES_constraints_number);
@@ -32,11 +32,11 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	qpOASES_lb << -10.0, -10.0, -10.0;
 	qpOASES_ub << 10.0, 10.0, 10.0;
 
-	bf_classK_gain_1 = 2.0;
-	bf_classK_gain_2 = 0.5;
+	bf_classK_gain_1 = 0.05;
+	bf_classK_gain_2 = 0.01;
 	bf_gain_lie_0_kh = bf_classK_gain_1 * bf_classK_gain_2;
 	bf_gain_lie_1_kh = bf_classK_gain_1 + bf_classK_gain_2;
-	bf_safe_margin = 0.5;
+	bf_safe_margin = 1.5;
 
 	takeoff_altitude = 1.0;
 	setpoint_position = Eigen::Vector3d(0.0, 0.0, 0.0);
@@ -62,12 +62,12 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	std::shared_ptr<BezierSegment> p_segment_4;
 	std::shared_ptr<BezierSegment> p_segment_land;
 
-	double time_takeoff = 20.0;
+	double time_takeoff = 5.0;
 	double time_segment_1 = 20.0;
 	double time_segment_2 = 20.0;
 	double time_segment_3 = 20.0;
-	double time_segment_4 = 40.0;
-	double time_land = 10.0;
+	double time_segment_4 = 20.0;
+	double time_land = 5.0;
 	total_time = time_takeoff + time_segment_1 + time_segment_2 + time_segment_3 + time_segment_4 + time_land;
 
 	// Takeoff
@@ -260,6 +260,27 @@ void DoubleIntegratorGovernor::debugCallback() {
 	msg.color.b = 1.0;
 	msg.color.a = 1.0;
 	setpoint_visualizer_publisher->publish(msg);
+
+	msg.header.frame_id = "map";
+	msg.header.stamp = this->get_clock()->now();
+	msg.id = 2;
+	msg.type = visualization_msgs::msg::Marker::SPHERE;
+	msg.action = visualization_msgs::msg::Marker::ADD;
+	msg.pose.position.x = reference_position.x();
+	msg.pose.position.y = reference_position.y();
+	msg.pose.position.z = reference_position.z();
+	msg.pose.orientation.w = 1.0;
+	msg.pose.orientation.x = 0.0;
+	msg.pose.orientation.y = 0.0;
+	msg.pose.orientation.z = 0.0;
+	msg.scale.x = 0.6;
+	msg.scale.y = 0.6;
+	msg.scale.z = 0.6;
+	msg.color.r = 1.0;
+	msg.color.g = 0.0;
+	msg.color.b = 1.0;
+	msg.color.a = 0.5;
+	trajectory_visualizer_publisher->publish(msg);
 }
 
 void DoubleIntegratorGovernor::publishPX4Command(uint16_t command, float param1 = 0.0, float param2 = 0.0) {
