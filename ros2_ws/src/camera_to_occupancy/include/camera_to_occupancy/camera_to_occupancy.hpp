@@ -76,4 +76,5 @@ class CameraToOccupancy : public rclcpp::Node {
 		// Publishers
 		rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr publisher_occupancy_grid;
 		rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr publisher_debug_pointcloud;
+		rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr publisher_empty_pointcloud;
 };

@@ -23,8 +23,17 @@ ament_target_dependencies(vicon_to_odometry
 	nav_msgs geometry_msgs
 	tf2_ros
 )
-
 install(TARGETS vicon_to_odometry
+        DESTINATION lib/${PROJECT_NAME}
+)
+
+add_executable(T265_to_odometry src/T265_to_odometry.cpp)
+ament_target_dependencies(T265_to_odometry
+	rclcpp 
+	nav_msgs geometry_msgs
+	tf2_ros
+)
+install(TARGETS T265_to_odometry
         DESTINATION lib/${PROJECT_NAME}
 )
 

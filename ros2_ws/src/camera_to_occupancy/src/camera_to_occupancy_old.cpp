@@ -106,7 +106,7 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 
 	// Read point cloud from topic
 	pcl::fromROSMsg(*msg_pointcloud, *current_pointcloud);
-	if (current_pointcloud->size() < 5000) {
+	if (current_pointcloud->size() < 100) {
 		RCLCPP_INFO(this->get_logger(), "Empty cloud, returning");
 		return;
 	}
@@ -117,7 +117,7 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 	voxel_filter.setInputCloud(current_pointcloud);
 	voxel_filter.setLeafSize(0.05f, 0.05f, 0.05f);
 	voxel_filter.filter(*current_pointcloud);
-	if (current_pointcloud->size() < 5000){
+	if (current_pointcloud->size() < 100){
 		RCLCPP_INFO(this->get_logger(), "Empty cloud, returning");
 		return;
 	}
@@ -140,7 +140,7 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 	distance_filter.setInputCloud(current_pointcloud);
 	distance_filter.setKeepOrganized(true);
 	distance_filter.filter(*current_pointcloud);
-	if (current_pointcloud->size() < 5000){
+	if (current_pointcloud->size() < 100){
 		RCLCPP_INFO(this->get_logger(), "Empty cloud, returning");
 		return;
 	}
@@ -164,7 +164,7 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 	ceiling_remover.setInputCloud(current_pointcloud);
 	ceiling_remover.setKeepOrganized(true);
 	ceiling_remover.filter(*current_pointcloud);
-	if (current_pointcloud->size() < 5000){
+	if (current_pointcloud->size() < 100){
 		RCLCPP_INFO(this->get_logger(), "Empty cloud, returning");
 		return;
 	}
@@ -178,7 +178,7 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 	ground_remover.setInputCloud(current_pointcloud);
 	ground_remover.setKeepOrganized(true);
 	ground_remover.filter(*current_pointcloud);
-	if (current_pointcloud->size() < 5000){
+	if (current_pointcloud->size() < 100){
 		RCLCPP_INFO(this->get_logger(), "Empty cloud, returning");
 		return;
 	}
@@ -205,27 +205,27 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 	// extract_plane.filter(*current_pointcloud);
 
 	// Extract Objects
-	RCLCPP_INFO(this->get_logger(), "Pointcloud size: %ld", current_pointcloud->size());
-	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
-	tree->setInputCloud(current_pointcloud);
-	std::vector<pcl::PointIndices> cluster_indices;
-	pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclidean_clusters;
-	euclidean_clusters.setClusterTolerance(0.05);
-	euclidean_clusters.setMinClusterSize(50);
-	euclidean_clusters.setMaxClusterSize(25000);
-	euclidean_clusters.setSearchMethod(tree);
-	euclidean_clusters.setInputCloud(current_pointcloud);
-	euclidean_clusters.extract(cluster_indices);
+	// RCLCPP_INFO(this->get_logger(), "Pointcloud size: %ld", current_pointcloud->size());
+	// pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
+	// tree->setInputCloud(current_pointcloud);
+	// std::vector<pcl::PointIndices> cluster_indices;
+	// pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclidean_clusters;
+	// euclidean_clusters.setClusterTolerance(0.10);
+	// euclidean_clusters.setMinClusterSize(50);
+	// euclidean_clusters.setMaxClusterSize(25000);
+	// euclidean_clusters.setSearchMethod(tree);
+	// euclidean_clusters.setInputCloud(current_pointcloud);
+	// euclidean_clusters.extract(cluster_indices);
 
 	// Prepare projection
-	pcl::ModelCoefficients::Ptr projection_coefficients(new pcl::ModelCoefficients());
-	projection_coefficients->values.resize(4);
-	projection_coefficients->values[0] = projection_coefficients->values[1] = 0.0;
-	projection_coefficients->values[2] = 1.0;
-	projection_coefficients->values[3] = 0.0;
-	pcl::ProjectInliers<pcl::PointXYZ> plane_projection;
-	plane_projection.setModelType(pcl::SACMODEL_PLANE);
-	plane_projection.setModelCoefficients(projection_coefficients);
+	// pcl::ModelCoefficients::Ptr projection_coefficients(new pcl::ModelCoefficients());
+	// projection_coefficients->values.resize(4);
+	// projection_coefficients->values[0] = projection_coefficients->values[1] = 0.0;
+	// projection_coefficients->values[2] = 1.0;
+	// projection_coefficients->values[3] = 0.0;
+	// pcl::ProjectInliers<pcl::PointXYZ> plane_projection;
+	// plane_projection.setModelType(pcl::SACMODEL_PLANE);
+	// plane_projection.setModelCoefficients(projection_coefficients);
 
 	double yaw_orientation = yawRotationQuaternion(drone_orientation);
 	pcl::PointCloud<pcl::PointXYZ>::Ptr empty_pointcloud(new pcl::PointCloud<pcl::PointXYZ>);
@@ -257,52 +257,93 @@ void CameraToOccupancy::pointcloudCallback(const sensor_msgs::msg::PointCloud2::
 			}
 
 			// Mark point as explored
-			if (map_grid.data[index_x + index_y * map_grid.info.width] != 100)
+			if (map_grid.data[index_x + index_y * map_grid.info.width] != 127)
 				map_grid.data[index_x + index_y * map_grid.info.width] = 0;
 		}		
 	}		
 
 	// Project each detected cluster on to the plane and fill "imaginary sensor"
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_sum(new pcl::PointCloud<pcl::PointXYZ>);
-	for (const auto& cluster : cluster_indices) {
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster(new pcl::PointCloud<pcl::PointXYZ>);
-		for (const auto& idx : cluster.indices) {
-			cloud_cluster->push_back((*current_pointcloud)[idx]);
+	// pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_sum(new pcl::PointCloud<pcl::PointXYZ>);
+	// for (const auto& cluster : cluster_indices) {
+		// pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster(new pcl::PointCloud<pcl::PointXYZ>);
+		// for (const auto& idx : cluster.indices) {
+			// cloud_cluster->push_back((*current_pointcloud)[idx]);
+		// }
+// 
+		// cloud_cluster->width = cloud_cluster->size();
+		// cloud_cluster->height = 1;
+		// cloud_cluster->is_dense = true;
+		// plane_projection.setInputCloud(cloud_cluster);
+		// plane_projection.filter(*cloud_cluster);
+// 
+		// *cloud_sum += *cloud_cluster;
+		// cloud_sum->width = cloud_sum->size();
+		// cloud_sum->height = 1;
+		// cloud_sum->is_dense = true;
+// 
+		// for (const pcl::PointXYZ& point : cloud_cluster->points) {
+			// int index_x, index_y;
+// 
+			// // Convert coordinate to grid point
+			// // x coordinate
+			// index_x = int(std::floor(point.x / map_grid.info.resolution));
+			// if ((unsigned int) index_x > map_grid.info.width-1 || index_x < 1) {
+				// // If the point is out of bounds, ignore point
+				// continue;
+			// }
+// 
+			// // y coordinate	
+			// index_y = int(std::floor(point.y / map_grid.info.resolution));
+			// if ((unsigned int) index_y > map_grid.info.height-1 || index_y < 1) {
+				// // If the point is out of bounds, ignore point
+				// continue;
+			// }
+// 
+			// // Mark point as occupied
+			// map_grid.data[index_x + index_y * map_grid.info.width] = 127;
+		// }
+	// }
+
+	std::vector<int> modified_index;
+	std::vector<int> counters;
+	for (const pcl::PointXYZ& point : current_pointcloud->points) {
+		int index_x, index_y;
+
+		// Convert coordinate to grid point
+		// x coordinate
+		index_x = int(std::floor(point.x / map_grid.info.resolution));
+		if ((unsigned int) index_x > map_grid.info.width-1 || index_x < 1) {
+			// If the point is out of bounds, ignore point
+			continue;
 		}
- 
-		cloud_cluster->width = cloud_cluster->size();
-		cloud_cluster->height = 1;
-		cloud_cluster->is_dense = true;
-		plane_projection.setInputCloud(cloud_cluster);
-		plane_projection.filter(*cloud_cluster);
- 
-		*cloud_sum += *cloud_cluster;
-		cloud_sum->width = cloud_sum->size();
-		cloud_sum->height = 1;
-		cloud_sum->is_dense = true;
- 
-		for (const pcl::PointXYZ& point : cloud_cluster->points) {
-			int index_x, index_y;
- 
-			// Convert coordinate to grid point
-			// x coordinate
-			index_x = int(std::floor(point.x / map_grid.info.resolution));
-			if ((unsigned int) index_x > map_grid.info.width-1 || index_x < 1) {
-				// If the point is out of bounds, ignore point
-				continue;
-			}
 
-			// y coordinate	
-			index_y = int(std::floor(point.y / map_grid.info.resolution));
-			if ((unsigned int) index_y > map_grid.info.height-1 || index_y < 1) {
-				// If the point is out of bounds, ignore point
-				continue;
-			}
+		// y coordinate	
+		index_y = int(std::floor(point.y / map_grid.info.resolution));
+		if ((unsigned int) index_y > map_grid.info.height-1 || index_y < 1) {
+			// If the point is out of bounds, ignore point
+			continue;
+		}
 
-			// Mark point as occupied
-			map_grid.data[index_x + index_y * map_grid.info.width] = 100;
+		// Mark point as occupied
+		int grid_coordinate = index_x + index_y * map_grid.info.width;
+		std::vector<int>::iterator it = std::find(modified_index.begin(), modified_index.end(), grid_coordinate);
+		if (it == modified_index.end()) {
+			modified_index.push_back(grid_coordinate);
+			counters.push_back(1);
+		} else {
+			int index = it - modified_index.begin();
+			counters[index]++;
 		}
 	}
+
+	for (unsigned int index = 0; index < counters.size(); index++) {
+		if (counters[index] > 50) {
+			map_grid.data[modified_index[index]] = 127;
+		}
+	}
+
+	modified_index.clear();
+	counters.clear();
 
 	// Debug
 	sensor_msgs::msg::PointCloud2 debug_pointcloud;

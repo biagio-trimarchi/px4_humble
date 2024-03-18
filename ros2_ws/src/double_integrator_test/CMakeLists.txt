@@ -55,8 +55,16 @@ ament_target_dependencies(visualization_test
 	rclcpp Eigen3 visualization_msgs geometry_msgs
 )
 
+add_executable(governor_takeoff src/test_takeoff.cpp src/bezier_utilities.cpp src/trajectory.cpp)
+ament_target_dependencies(governor_takeoff
+	rclcpp px4_msgs Eigen3 
+	std_msgs visualization_msgs geometry_msgs 
+	nav_msgs tf2 tf2_ros 
+)
+
 install( TARGETS governor_node DESTINATION lib/${PROJECT_NAME})
 install( TARGETS governor_node_2 DESTINATION lib/${PROJECT_NAME})
+install( TARGETS governor_takeoff DESTINATION lib/${PROJECT_NAME})
 install( TARGETS governor_node_moving_obs DESTINATION lib/${PROJECT_NAME})
 install( TARGETS visualization_test DESTINATION lib/${PROJECT_NAME})
 

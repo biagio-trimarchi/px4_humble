@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(tf2_manager)
+project(tf2_manager_old)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -31,31 +31,25 @@ include_directories(
   ${EIGEN3_INCLUDE_DIRS}
 )
 
-# REALSENSE TEST
-add_executable(realsense_test src/realsense_test.cpp)
-target_include_directories(realsense_test PUBLIC
+add_executable(tf2_gazebo_manager_node src/tf2_gazebo_manager.cpp)
+
+target_include_directories(tf2_gazebo_manager_node PUBLIC
   ${EIGEN3_INCLUDE_DIRS}
-)
-ament_target_dependencies(realsense_test
-  rclcpp std_msgs geometry_msgs 
-  px4_msgs Eigen3 tf2 
-  tf2_ros nav_msgs
-)
-INSTALL( TARGETS realsense_test
-  DESTINATION lib/${PROJECT_NAME}
 )
 
-# LDC MANAGER
-add_executable(ldc_tf_manager src/ldc_tf_manager.cpp)
-target_include_directories(realsense_test PUBLIC
-  ${EIGEN3_INCLUDE_DIRS}
+ament_target_dependencies(tf2_gazebo_manager_node
+  rclcpp
+  std_msgs 
+  geometry_msgs 
+  px4_msgs 
+  Eigen3 
+  tf2 
+  tf2_ros
+  px4_ros_com
+  nav_msgs
 )
-ament_target_dependencies(ldc_tf_manager
-  rclcpp std_msgs geometry_msgs 
-  px4_msgs Eigen3 tf2 
-  tf2_ros nav_msgs
-)
-INSTALL( TARGETS ldc_tf_manager
+
+INSTALL( TARGETS tf2_gazebo_manager_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

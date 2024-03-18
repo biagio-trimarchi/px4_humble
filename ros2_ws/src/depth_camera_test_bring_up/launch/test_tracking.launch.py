@@ -76,11 +76,6 @@ def generate_launch_description():
         )
                        )
 
-    launch_args.append(DeclareLaunchArgument(
-        "vicon_topic",
-        default_value="camera"
-        )
-                       )
 
     for arg in launch_args:
         launch_description.add_action(arg)
@@ -101,32 +96,13 @@ def generate_launch_description():
 
     ### TOPICS
     topic_odometry = "/odometry"
-    topic_depth_camera_pointcloud = "/camera/depth/color/points"
+    topic_depth_camera_pointcloud = "/D400/depth/color/points"
     topic_vicon = "/vicon/camera/camera"
     topic_occupancy_grid = "/map_occupancy_grid"
     topic_debug_pointcloud = "/debug_pointcloud"
     
     ### NODES
     nodes = []
-
-    nodes.append(Node(
-        package = "vicon_manager",
-        executable = "vicon_to_odometry",
-        name = "odometry_converter",
-        parameters = [
-            {"offset_x" : param_offset_x},
-            {"offset_y" : param_offset_y},
-            {"offset_z" : param_offset_z},
-            {"tf_parent" : param_tf_parent},
-            {"tf_child" : param_tf_child}
-            ],
-        remappings = [
-            ("/topic_odometry", topic_odometry),
-            ("/topic_vicon", topic_vicon)
-            ],
-        prefix = []
-        )
-                 )
 
     nodes.append(Node(
         package = "camera_to_occupancy",
@@ -153,33 +129,5 @@ def generate_launch_description():
 
     for node in nodes:
         launch_description.add_action(node)
-
-    launch_files = []
-    launch_file_path = os.path.join(
-            get_package_share_directory("realsense2_camera"),
-            'launch',
-            'rs_launch.py'
-            )
-    launch_files.append(IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(launch_file_path),
-        launch_arguments={
-            'pointcloud.enable' : "true",
-            'pointcloud.stream_filter' : "0"
-            }.items()
-        )
-            )
-
-    launch_file_path = os.path.join(
-            get_package_share_directory("vicon_receiver"),
-            'launch',
-            'client.launch.py'
-            )
-    launch_files.append(IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(launch_file_path),
-        )
-            )
-    
-    for file in launch_files:
-        launch_description.add_action(file)
 
     return launch_description
