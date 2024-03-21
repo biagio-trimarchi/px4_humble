@@ -19,6 +19,7 @@ include_directories(
 # Create Interface
 rosidl_generate_interfaces(${PROJECT_NAME}
 	"srv/QueryEstimate.srv"
+	"msg/QueryEstimate.msg"
 )
 
 # Add Library

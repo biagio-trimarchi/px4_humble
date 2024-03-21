@@ -180,6 +180,6 @@ Eigen::Matrix3d GaussianProcessMatern32::hessian_kernel(Eigen::Vector3d x_1,
 	}
 
 	return (-3.0 * Eigen::Matrix3d::Identity() + 
-	         3.0 * std::sqrt(3.0) * ((x_1 - x_2) *  (x_1 - x_2).transpose()) / r ) * 
+	         3.0 * std::sqrt(3.0) * ((x_1 - x_2) * (x_1 - x_2).transpose()) / r ) * 
 	         std::exp(-std::sqrt(3.0) * r);
 }

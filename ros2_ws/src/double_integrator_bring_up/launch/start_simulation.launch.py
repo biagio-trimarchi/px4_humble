@@ -42,7 +42,7 @@ def generate_launch_description():
 
         launch_args.append(DeclareLaunchArgument(
             "gp_lambda_whittle",
-            default_value="40.0"
+            default_value="7.5"
             )
                            )
         launch_args.append(DeclareLaunchArgument(

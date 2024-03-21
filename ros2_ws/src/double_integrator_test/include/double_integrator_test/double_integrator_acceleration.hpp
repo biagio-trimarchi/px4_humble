@@ -13,7 +13,6 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <nav_msgs/msg/odometry.hpp>
-#include <std_msgs/msg/float64.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 
@@ -55,9 +54,6 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		// VARIABLES
 		Eigen::Vector3d drone_position;
 		Eigen::Vector3d drone_velocity;
-		Eigen::Vector3d reference_position;
-		Eigen::Vector3d reference_velocity;
-		Eigen::Vector3d reference_acceleration;
 
 		// PD gains
 		double PD_position_gain;
@@ -91,8 +87,6 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		Trajectory trajectory;
 		double trajectory_time;
 		double total_time;
-		rclcpp::Time trajectory_start_time;
-		rclcpp::Time time_last_callback;
 		
 		int debug_timer_frequency_ms;
 		int dynamics_timer_frequency_ms;
@@ -102,7 +96,8 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		enum governor_state {INIT, ARMED, TAKEOFF, HOVER, FOLLOW_TRAJECTORY, LAND};
 		governor_state agent_state;
 		bool message_received;
-		bool transition_takeoff_reached;
+		bool transition_setpoint_reached;
+		bool transition_trajectory_followed;
 		bool is_drone_armed;
 		bool is_drone_offboard;
 		bool follow_trajectory;
@@ -126,11 +121,8 @@ class DoubleIntegratorGovernor : public rclcpp::Node {
 		rclcpp::Publisher<px4_msgs::msg::TrajectorySetpoint>::SharedPtr setpoint_publisher;
 		rclcpp::Publisher<px4_msgs::msg::OffboardControlMode>::SharedPtr offboard_publisher;
 		rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr trajectory_visualizer_publisher;
-		rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr carota_visualizer_publisher;
 		rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr setpoint_visualizer_publisher;
 		rclcpp::Publisher<px4_msgs::msg::VehicleCommand>::SharedPtr vehicle_command_publisher;
-		rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_barrier_value;
-		rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_barrier_derivative;
 
 		// Services
 		rclcpp::Client<log_gpis::srv::QueryEstimate>::SharedPtr client_log_gpis;

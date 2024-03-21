@@ -37,6 +37,8 @@ class GazeboManager : public rclcpp::Node {
 		void publishTFs();
 		void logGPISCallback(const std::shared_ptr<log_gpis::srv::QueryEstimate::Request> request,
                          const std::shared_ptr<log_gpis::srv::QueryEstimate::Response> response);
+		void realDistanceCallback(const std::shared_ptr<log_gpis::srv::QueryEstimate::Request> request,
+                              const std::shared_ptr<log_gpis::srv::QueryEstimate::Response> response);
 		void visualizationCallback();
 		void scanRegion();
 	

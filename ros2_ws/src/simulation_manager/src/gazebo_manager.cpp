@@ -12,7 +12,7 @@ GazeboManager::GazeboManager() : Node("gazebo_manager") {
 	this->declare_parameter("world_name", "lgpis_test_1");
 	// this->declare_parameter("world_name", "casy_scenario_1");
 
-	this->declare_parameter("gp_lambda_whittle", 40.0);
+	this->declare_parameter("gp_lambda_whittle", 7.5);
 	this->declare_parameter("gp_resolution", 0.1);
 	this->declare_parameter("gp_error_variance", 0.01);
 
@@ -83,6 +83,18 @@ GazeboManager::GazeboManager() : Node("gazebo_manager") {
 
 	debug_message = visualization_msgs::msg::Marker();
 	initializeWorld();
+
+	// Debug
+	// double test_distance
+	// Eigen::Vector3d test_point;
+	// Test sphere
+	// Eigen::Vector3d sphere_center = Eigen::Vector3d(2.0, 2.0, 1.0);
+	// double sphere_radius = 2.0;
+	// test_point = Eigen::Vector3d(5.0, 6.0, -3.0);
+	// test_distance = distanceFromSphere(test_point, sphere_center, sphere_radius);
+	
+	// Test cube
+	// Test cylinder
 }
 
 GazeboManager::~GazeboManager() {}
@@ -109,6 +121,7 @@ void GazeboManager::odometryCallback(nav_msgs::msg::Odometry::SharedPtr msg) {
 	odometry_msg.header.stamp = this->now();
 	publisher_drone_odometry->publish(odometry_msg);
 
+	// ENU TO NED
 	Eigen::Vector3d drone_position_px4 = px4_ros_com::frame_transforms::enu_to_ned_local_frame(
 		Eigen::Vector3d(
 			msg->pose.pose.position.x,
@@ -116,6 +129,7 @@ void GazeboManager::odometryCallback(nav_msgs::msg::Odometry::SharedPtr msg) {
 			msg->pose.pose.position.z
 		)
 	);
+	
 
 	Eigen::Vector3d drone_velocity_px4 = px4_ros_com::frame_transforms::enu_to_ned_local_frame(
 		Eigen::Vector3d(
@@ -192,6 +206,18 @@ void GazeboManager::logGPISCallback(const std::shared_ptr<log_gpis::srv::QueryEs
 	response->hessian_estimate[6] = hessian(2, 0);
 	response->hessian_estimate[7] = hessian(2, 1);
 	response->hessian_estimate[8] = hessian(2, 2);
+}
+
+void GazeboManager::realDistanceCallback(const std::shared_ptr<log_gpis::srv::QueryEstimate::Request> request,
+                                         const std::shared_ptr<log_gpis::srv::QueryEstimate::Response> response) {
+	Eigen::Vector3d position(request->position[0], request->position[1], request->position[2]);
+	response->estimate = 0;
+
+	if (world_name == "lgpis_test_1") {
+		
+	}
+
+	
 }
 
 void GazeboManager::visualizationCallback() {

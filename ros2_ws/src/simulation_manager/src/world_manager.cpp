@@ -195,12 +195,12 @@ void buildWorld_lgpis_test_1(LogGPIS& log_gpis) {
 
 void buildWorld_casy_scenario_1(LogGPIS& log_gpis) {
 		// Add ground
-		for (double x = -3.5; x < 3.6; x += 0.5) {
-			for (double y = -3.5; y < 3.6; y += 0.5) {
-				Eigen::Vector3d point(x, y, -0.5);
-				log_gpis.add_sample(point);
-			}
-		}
+		// for (double x = -3.5; x < 3.6; x += 0.5) {
+			// for (double y = -3.5; y < 3.6; y += 0.5) {
+				// Eigen::Vector3d point(x, y, -0.5);
+				// log_gpis.add_sample(point);
+			// }
+		// }
 
 		// Add roof
 		for (double x = -3.5; x < 3.6; x += 0.5) {
@@ -287,4 +287,77 @@ void buildWorld_casy_scenario_1(LogGPIS& log_gpis) {
 		std::cout <<  "LogGPIS training..." << std::endl;
 		log_gpis.train();
 		std::cout <<  "LogGPIS training finished!" << std::endl;
+}
+
+double distanceFromCylinder(Eigen::Vector3d position, Eigen::Vector3d center, double radius, double height) {
+	// Auxiliary variables for computations
+	Eigen::Vector2d position_xy = Eigen::Vector2d(position.x(), position.y());
+	Eigen::Vector2d center_xy = Eigen::Vector2d(center.x(), center.y());
+	double xy_distance = (position_xy - center_xy).norm();
+	double theta = std::atan2(position_xy.y(), position_xy.x());
+	double z_distance = position.z() - center.z();
+
+
+	// Straight over the cylinder
+	if (xy_distance < radius && z_distance > height/2.0) {
+		return z_distance - height/2.0;
+	}
+
+	// Over the cylinder, but out of infinite projection
+	if (xy_distance > radius && z_distance > height/2.0) {
+		Eigen::Vector3d boundary_point = Eigen::Vector3d(
+		  center.x() + radius * std::cos(theta),
+		  center.y() + radius * std::sin(theta),
+			center.z() + height/2.0
+		);
+
+		return (position - boundary_point).norm();
+	}
+
+	// Inside the cylinder 
+	if (xy_distance < radius && z_distance < height / 2.0 && z_distance > -height / 2.0) {
+		double distance_from_top = height/2.0 - z_distance;
+		double distance_from_bottom = -height/2.0 - z_distance;
+		double unsigned_distance = std::min(std::abs(distance_from_top), std::abs(distance_from_bottom));
+		unsigned_distance = std::min(std::abs(xy_distance), std::abs(unsigned_distance));
+		return 0.0;
+	}
+	
+	// Outside the cylinder
+	if (xy_distance > radius && z_distance < height / 2.0 && z_distance > -height / 2.0) {
+	}
+
+	// Straight below the cylinder
+	if (xy_distance < radius && z_distance < -height / 2.0) {
+		return z_distance + height / 2.0;
+	}
+
+	// Below the cylinder, but outside of infinite projection
+	if (xy_distance > radius && z_distance < -height / 2.0) {
+		Eigen::Vector3d boundary_point = Eigen::Vector3d(
+		  center.x() + radius * std::cos(theta),
+		  center.y() + radius * std::sin(theta),
+			center.z() - height/2.0
+		);
+
+		return (position - boundary_point).norm();
+	}
+
+	// Something went wrong
+	return 0.0;
+}
+
+double distanceFromBox(Eigen::Vector3d point, Eigen::Vector3d center, Eigen::Vector3d sizes){
+	// Find projection of the box
+	Eigen::Vector3d projection_on_box;
+	projection_on_box.x() = std::max(center.x() - sizes.x() / 2.0, std::min(point.x(), center.x() + sizes.x() / 2.0));
+	projection_on_box.y() = std::max(center.y() - sizes.y() / 2.0, std::min(point.y(), center.y() + sizes.y() / 2.0));
+	projection_on_box.z() = std::max(center.z() - sizes.z() / 2.0, std::min(point.z(), center.z() + sizes.z() / 2.0));
+
+	// Compute distance between given point and projection on the box
+	return (point - projection_on_box).norm();
+}
+
+double distanceFromSphere(Eigen::Vector3d position, Eigen::Vector3d center, double radius) {
+	return std::max((position - center).norm() - radius, 0.0);
 }

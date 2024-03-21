@@ -21,6 +21,7 @@ find_package(Eigen3 REQUIRED)
 include_directories(
 	${PROJECT_SOURCE_DIR}/include
 	${EIGEN3_INCLUDE_DIRS}
+	${QPOASES_INCLUDE_DIRS}
 )
 
 add_library(world_utilities src/world_manager.cpp)
@@ -35,6 +36,15 @@ ament_target_dependencies(gazebo_manager
 
 install(TARGETS gazebo_manager DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY data DESTINATION share/${PROJECT_NAME})
+
+# Test
+add_executable(test_node src/double_integrator_test.cpp)
+target_link_libraries(test_node log_gpis::logGPIS world_utilities)
+ament_target_dependencies(test_node
+	rclcpp geometry_msgs visualization_msgs 
+	std_msgs Eigen3 log_gpis)
+target_link_libraries(test_node qpOASES)
+install(TARGETS test_node DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
