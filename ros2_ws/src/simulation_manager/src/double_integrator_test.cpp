@@ -25,13 +25,13 @@ Test::Test() : Node("Test") {
 	qpOASES_lb << -5.0, -5.0, -5.0;
 	qpOASES_ub << 5.0, 5.0, 5.0;
 
-	bf_classK_gain_1 = 5.50;
-	bf_classK_gain_2 = 3.30;
+	bf_classK_gain_1 = 1.10;
+	bf_classK_gain_2 = 1.10;
 	bf_gain_lie_0_kh = bf_classK_gain_1 * bf_classK_gain_2;
 	bf_gain_lie_1_kh = bf_classK_gain_1 + bf_classK_gain_2;
 	bf_safe_margin = 0.2;
 
-	gp_lambda_whittle = 10.00;
+	gp_lambda_whittle = 7.50;
 	gp_resolution = 0.1;
 	gp_error_variance = 0.01;
 	log_gpis = LogGPIS(gp_lambda_whittle, gp_resolution, gp_error_variance);

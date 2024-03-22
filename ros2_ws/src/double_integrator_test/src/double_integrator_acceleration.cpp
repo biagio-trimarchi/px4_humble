@@ -14,8 +14,8 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	drone_position = Eigen::Vector3d(0.0, 0.0, 0.0);
 	drone_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
 
-	PD_position_gain = 0.8;
-	PD_velocity_gain = 0.5;
+	PD_position_gain = 3.0;
+	PD_velocity_gain = 4.0;
 
 	qpOASES_constraints_number = 1;
 	qpOASES_solver = qpOASES::QProblem(3, qpOASES_constraints_number);
@@ -321,6 +321,7 @@ void DoubleIntegratorGovernor::stateMachine() {
 				RCLCPP_INFO(this->get_logger(), "[FOLLOW TRAJECTORY] Trajectory ended");
 				transition_trajectory_followed = false;
 				transition_setpoint_reached = false;
+				follow_trajectory = false;
 				setpoint_position = Eigen::Vector3d(drone_position.x(), drone_position.y(), 0.0);
 				agent_state = LAND;
 			}
@@ -328,7 +329,7 @@ void DoubleIntegratorGovernor::stateMachine() {
 
 		case LAND:
 			RCLCPP_INFO(this->get_logger(), "[LAND] Landing");
-			if (transition_trajectory_followed) {
+			if (transition_setpoint_reached) {
 				RCLCPP_INFO(this->get_logger(), "[LAND] Landed!");
 				message_received = false;
 				agent_state = ARMED;
@@ -432,23 +433,27 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	setpoint_acceleration = Eigen::Vector3d(0.0, 0.0, 0.0);
 	if (follow_trajectory) {
 		// Trajectory
-		setpoint_position = trajectory.evaluate_position(trajectory_time);
-		setpoint_velocity = trajectory.evaluate_velocity(trajectory_time);
-		setpoint_acceleration = trajectory.evaluate_acceleration(trajectory_time); 
+		// setpoint_position = trajectory.evaluate_position(trajectory_time);
+		// setpoint_velocity = trajectory.evaluate_velocity(trajectory_time);
+		// setpoint_acceleration = trajectory.evaluate_acceleration(trajectory_time); 
 		trajectory_time += double(dynamics_timer_frequency_ms) * 0.001;
 		if (trajectory_time > total_time) {
 			trajectory_time = total_time;
 
 			// Check if trajectory is finished
 			if ((drone_position - setpoint_position).norm() < 0.1) {
-				transition_trajectory_followed = true;
+				transition_trajectory_followed = false;
 			}
 		}
 		
 		// Compute acceleration
 		setpoint_position = Eigen::Vector3d(0.0, 0.0, takeoff_altitude);
 		setpoint_velocity = Eigen::Vector3d(0.0, 0.0, 0.0);
-		setpoint_acceleration += - PD_position_gain * ( drone_position - setpoint_position) 
+		RCLCPP_INFO(this->get_logger(), "Distance: %f", (drone_position - setpoint_position).norm());
+		RCLCPP_INFO(this->get_logger(), "Drone position: %f %f %f", drone_position.x(), drone_position.y(), drone_position.z() );
+		RCLCPP_INFO(this->get_logger(), "Setpoint position: %f %f %f", setpoint_position.x(), setpoint_position.y(), setpoint_position.z() );
+		RCLCPP_INFO(this->get_logger(), "Setpoint velocity: %f %f %f", setpoint_velocity.x(), setpoint_velocity.y(), setpoint_velocity.z() );
+		setpoint_acceleration  = - PD_position_gain * ( drone_position - setpoint_position) 
 		                         - PD_velocity_gain * ( drone_velocity - setpoint_velocity); 
 		// controlBarrierFunction();
 	} else {

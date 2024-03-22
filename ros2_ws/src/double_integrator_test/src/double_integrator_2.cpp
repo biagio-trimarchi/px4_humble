@@ -36,7 +36,7 @@ DoubleIntegratorGovernor::DoubleIntegratorGovernor() : Node("Governor") {
 	bf_classK_gain_2 = 3.30;
 	bf_gain_lie_0_kh = bf_classK_gain_1 * bf_classK_gain_2;
 	bf_gain_lie_1_kh = bf_classK_gain_1 + bf_classK_gain_2;
-	bf_safe_margin = 0.20;
+	bf_safe_margin = 0.30;
 
 	takeoff_altitude = 1.0;
 	setpoint_position = Eigen::Vector3d(0.0, 0.0, 0.0);
@@ -415,9 +415,9 @@ void DoubleIntegratorGovernor::px4StatusCallback(const px4_msgs::msg::VehicleCon
 
 void DoubleIntegratorGovernor::controlBarrierFunction() {
 	auto request = std::make_shared<log_gpis::srv::QueryEstimate::Request>();
-	request->position[0] = reference_position.x();
-	request->position[1] = reference_position.y();
-	request->position[2] = reference_position.z();
+	request->position[0] = drone_position.x();
+	request->position[1] = drone_position.y();
+	request->position[2] = drone_position.z();
 
 	auto future_and_id = client_log_gpis->async_send_request(request);
 	std::future_status status = future_and_id.wait_for(std::chrono::milliseconds(100));
@@ -455,7 +455,7 @@ void DoubleIntegratorGovernor::controlBarrierFunction() {
 	Eigen::Matrix<double, 6, 6> integrator_dynamic_A;
 	Eigen::Matrix<double, 6, 3> integrator_dynamic_B;
 
-	integrator_state.block(0,0,3,1) = reference_position;
+	integrator_state.block(0,0,3,1) = drone_position;
 	integrator_state.block(3,0,3,1) = reference_velocity;
 
 	integrator_dynamic_A.setZero();
@@ -511,13 +511,12 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	}
 
 	// Compute acceleration
-	setpoint_acceleration =  - PD_position_gain * ( reference_position - setpoint_position) 
+	setpoint_acceleration =  - PD_position_gain * ( drone_position - setpoint_position) 
 		                       - PD_velocity_gain * ( reference_velocity - setpoint_velocity); 
 	controlBarrierFunction();
 	reference_acceleration = setpoint_acceleration;
 
 	
-	reference_position += reference_velocity * elapsed_time;
 	reference_velocity += reference_acceleration * elapsed_time;
 	
 	// Load and publish Offboard and Setpoint messages
@@ -528,8 +527,8 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	setpoint_msg.timestamp = this->get_clock()->now().nanoseconds() / 1000;
 
 	// I should try also the acceleration only control
-	offboard_msg.position = true;
-	offboard_msg.velocity = false;
+	offboard_msg.position = false;
+	offboard_msg.velocity = true;
 	offboard_msg.acceleration = false;
 
 	setpoint_msg.position[0] = std::numeric_limits<double>::quiet_NaN();
@@ -544,13 +543,13 @@ void DoubleIntegratorGovernor::dynamicsCallback() {
 	setpoint_msg.acceleration[1] = std::numeric_limits<double>::quiet_NaN();
 	setpoint_msg.acceleration[2] = std::numeric_limits<double>::quiet_NaN();
 
-	setpoint_msg.position[0] = reference_position.y();
-	setpoint_msg.position[1] = reference_position.x();
-	setpoint_msg.position[2] = -reference_position.z();
+	// setpoint_msg.position[0] = reference_position.y();
+	// setpoint_msg.position[1] = reference_position.x();
+	// setpoint_msg.position[2] = -reference_position.z();
 
-	// setpoint_msg.velocity[0] = reference_velocity.y();
-	// setpoint_msg.velocity[1] = reference_velocity.x();
-	// setpoint_msg.velocity[2] = -reference_velocity.z();
+	setpoint_msg.velocity[0] = reference_velocity.y();
+	setpoint_msg.velocity[1] = reference_velocity.x();
+	setpoint_msg.velocity[2] = -reference_velocity.z();
 
 	// setpoint_msg.acceleration[0] = reference_acceleration.y();
 	// setpoint_msg.acceleration[1] = reference_acceleration.x();
