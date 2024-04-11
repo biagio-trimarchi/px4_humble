@@ -23,6 +23,7 @@
 #include <simulation_manager/world_manager.hpp>
 #include <log_gpis/logGPIS.hpp>
 #include <log_gpis/srv/query_estimate.hpp>
+#include <log_gpis/srv/multiple_query_estimate.hpp>
 
 // CLASSES
 class GazeboManager : public rclcpp::Node {
@@ -37,8 +38,8 @@ class GazeboManager : public rclcpp::Node {
 		void publishTFs();
 		void logGPISCallback(const std::shared_ptr<log_gpis::srv::QueryEstimate::Request> request,
                          const std::shared_ptr<log_gpis::srv::QueryEstimate::Response> response);
-		void realDistanceCallback(const std::shared_ptr<log_gpis::srv::QueryEstimate::Request> request,
-                              const std::shared_ptr<log_gpis::srv::QueryEstimate::Response> response);
+		void multipleLogGPISCallback(const std::shared_ptr<log_gpis::srv::MultipleQueryEstimate::Request> request,
+                                 const std::shared_ptr<log_gpis::srv::MultipleQueryEstimate::Response> response);
 		void visualizationCallback();
 		void scanRegion();
 	
@@ -52,7 +53,9 @@ class GazeboManager : public rclcpp::Node {
 		std::string world_name;
 		bool load_world;
 		bool save_world;
+		bool is_gpis_multiple;
 
+		std::vector<std::shared_ptr<LogGPIS>> log_gpis_vector;
 		LogGPIS log_gpis;
 		double gp_lambda_whittle;
 		double gp_resolution;
@@ -76,6 +79,7 @@ class GazeboManager : public rclcpp::Node {
 
 		// Services
 		rclcpp::Service<log_gpis::srv::QueryEstimate>::SharedPtr service_logGPIS;
+		rclcpp::Service<log_gpis::srv::MultipleQueryEstimate>::SharedPtr service_multipleLogGPIS;
 
 		// TF
 		std::shared_ptr<tf2_ros::StaticTransformBroadcaster> tf_static_broadcaster;

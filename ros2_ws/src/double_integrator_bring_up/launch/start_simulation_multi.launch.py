@@ -36,13 +36,13 @@ def generate_launch_description():
                            )
         launch_args.append(DeclareLaunchArgument(
             "world_name",
-            default_value="lgpis_test_1"
+            default_value="chamber_1"
             )
                            )
 
         launch_args.append(DeclareLaunchArgument(
             "gp_lambda_whittle",
-            default_value="40.0"
+            default_value="7.5"
             )
                            )
         launch_args.append(DeclareLaunchArgument(
@@ -99,7 +99,7 @@ def generate_launch_description():
         nodes = []
         nodes.append(Node(
             package = "double_integrator_test",
-            executable = "governor_takeoff",
+            executable = "governor_node_multi",
             name = "governor",
             namespace = drone_namespace,
             parameters = [

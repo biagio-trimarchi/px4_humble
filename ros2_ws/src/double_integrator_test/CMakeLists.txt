@@ -24,7 +24,6 @@ include_directories(
 	${QPOASES_INCLUDE_DIRS}
 )
 
-#add_executable(governor_node_2 src/double_integrator_2.cpp src/bezier_utilities.cpp src/trajectory.cpp src/logGPIS.cpp src/gp_matern32)
 add_executable(governor_node_2 src/double_integrator_2.cpp src/bezier_utilities.cpp src/trajectory.cpp)
 ament_target_dependencies(governor_node_2
 	rclcpp px4_msgs Eigen3 
@@ -43,9 +42,6 @@ ament_target_dependencies(governor_node_acceleration
 )
 target_link_libraries(governor_node_acceleration qpOASES)
 
-
-
-#add_executable(governor_node_moving_obs src/double_integrator_moving_obs.cpp src/bezier_utilities.cpp src/trajectory.cpp src/logGPIS.cpp src/gp_matern32)
 add_executable(governor_node_moving_obs src/double_integrator_moving_obs.cpp src/bezier_utilities.cpp src/trajectory.cpp)
 ament_target_dependencies(governor_node_moving_obs
 	rclcpp px4_msgs Eigen3 
@@ -63,10 +59,20 @@ ament_target_dependencies(governor_takeoff
 	nav_msgs tf2 tf2_ros 
 )
 
+add_executable(governor_node_multi src/test_multi_gpis.cpp)
+ament_target_dependencies(governor_node_multi
+	rclcpp px4_msgs Eigen3 
+	std_msgs visualization_msgs geometry_msgs 
+	nav_msgs tf2 tf2_ros 
+	log_gpis
+)
+target_link_libraries(governor_node_multi qpOASES)
+
 install( TARGETS governor_node_2 DESTINATION lib/${PROJECT_NAME})
 install( TARGETS governor_node_acceleration DESTINATION lib/${PROJECT_NAME})
 install( TARGETS governor_takeoff DESTINATION lib/${PROJECT_NAME})
 install( TARGETS governor_node_moving_obs DESTINATION lib/${PROJECT_NAME})
+install( TARGETS governor_node_multi DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

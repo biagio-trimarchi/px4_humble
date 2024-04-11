@@ -1,12 +1,12 @@
 // LIBRARIES
-#include <double_integrator_test/gp_matern32.hpp>
+#include <log_gpis/gp_matern12.hpp>
 
 // CLASSES
-// GAUSSIAN PROCESS MATERN 32
+// GAUSSIAN PROCESS MATERN 12
 // Public Functions
-GaussianProcessMatern32::GaussianProcessMatern32() {}
+GaussianProcessMatern12::GaussianProcessMatern12() {}
 
-GaussianProcessMatern32::GaussianProcessMatern32(double length_scale,
+GaussianProcessMatern12::GaussianProcessMatern12(double length_scale,
                                                  double error_variance,
 																								 double resolution) {
 	this->length_scale = length_scale;
@@ -15,10 +15,10 @@ GaussianProcessMatern32::GaussianProcessMatern32(double length_scale,
 	number_of_samples = 0;
 }
 
-GaussianProcessMatern32::~GaussianProcessMatern32() {}
+GaussianProcessMatern12::~GaussianProcessMatern12() {}
 
 // Public Functions
-void GaussianProcessMatern32::add_sample(Eigen::Vector3d x, double y) {
+void GaussianProcessMatern12::add_sample(Eigen::Vector3d x, double y) {
 	x /= length_scale;
 
 	if (number_of_samples == 0) {
@@ -41,7 +41,7 @@ void GaussianProcessMatern32::add_sample(Eigen::Vector3d x, double y) {
 	number_of_samples++;
 }
 
-void GaussianProcessMatern32::train() {
+void GaussianProcessMatern12::train() {
 	Eigen::MatrixXd L_cholesky;
 
 	K = Eigen::MatrixXd::Zero(number_of_samples, number_of_samples);
@@ -52,11 +52,10 @@ void GaussianProcessMatern32::train() {
 	K += error_variance * Eigen::MatrixXd::Identity(number_of_samples, number_of_samples);
 
 	L_cholesky = K.llt().matrixL();
-alpha = L_cholesky.transpose().colPivHouseholderQr().solve(L_cholesky.colPivHouseholderQr().solve(data_y));
- 
+	alpha = L_cholesky.transpose().colPivHouseholderQr().solve(L_cholesky.colPivHouseholderQr().solve(data_y)); 
 }
 
-double GaussianProcessMatern32::posterior_mean(Eigen::Vector3d x) {
+double GaussianProcessMatern12::posterior_mean(Eigen::Vector3d x) {
 	Eigen::RowVectorXd k(number_of_samples);
 
 	x /= length_scale;
@@ -66,7 +65,7 @@ double GaussianProcessMatern32::posterior_mean(Eigen::Vector3d x) {
 	return k * alpha;
 }
 
-Eigen::RowVector3d GaussianProcessMatern32::gradient_posterior_mean(Eigen::Vector3d x) {
+Eigen::RowVector3d GaussianProcessMatern12::gradient_posterior_mean(Eigen::Vector3d x) {
 	Eigen::MatrixX3d dk;
 	dk.resize(number_of_samples, 3);
 
@@ -77,7 +76,7 @@ Eigen::RowVector3d GaussianProcessMatern32::gradient_posterior_mean(Eigen::Vecto
 	return alpha.transpose() * dk;
 }
 
-Eigen::Matrix3d GaussianProcessMatern32::hessian_posterior_mean(Eigen::Vector3d x) {
+Eigen::Matrix3d GaussianProcessMatern12::hessian_posterior_mean(Eigen::Vector3d x) {
 	Eigen::Matrix3d auxiliary_sum = Eigen::Matrix3d::Zero();
 	
 	x /= length_scale;
@@ -87,7 +86,7 @@ Eigen::Matrix3d GaussianProcessMatern32::hessian_posterior_mean(Eigen::Vector3d 
 	return auxiliary_sum;
 }
 
-double GaussianProcessMatern32::posterior_variance(Eigen::Vector3d x) {
+double GaussianProcessMatern12::posterior_variance(Eigen::Vector3d x) {
 	Eigen::VectorXd k(number_of_samples);
 
 	x /= length_scale;
@@ -98,7 +97,7 @@ double GaussianProcessMatern32::posterior_variance(Eigen::Vector3d x) {
 	return kernel(x, x) - k.transpose() * aux;
 }
 
-Eigen::RowVector3d GaussianProcessMatern32::gradient_posterior_variance(Eigen::Vector3d x) {
+Eigen::RowVector3d GaussianProcessMatern12::gradient_posterior_variance(Eigen::Vector3d x) {
 	Eigen::VectorXd k(number_of_samples);
 	Eigen::MatrixXd dk(number_of_samples, number_of_samples);
 
@@ -112,8 +111,41 @@ Eigen::RowVector3d GaussianProcessMatern32::gradient_posterior_variance(Eigen::V
 	return -2.0 * k.transpose() * aux.transpose() * dk;
 }
 
+Eigen::MatrixXd GaussianProcessMatern12::getK() {
+	return K;
+}
+
+Eigen::MatrixXd GaussianProcessMatern12::getAlpha() {
+	return alpha;
+}
+
+Eigen::MatrixXd GaussianProcessMatern12::getDataX() {
+	return data_x * length_scale;
+}
+
+Eigen::MatrixXd GaussianProcessMatern12::getDataY() {
+	return data_y;
+}
+
+void GaussianProcessMatern12::loadData(const Eigen::MatrixXd& inputK,
+                                       const Eigen::MatrixXd& input_alpha,
+                                       const Eigen::MatrixXd& input_data_x,
+                                       const Eigen::VectorXd& input_data_y) {
+
+	if ((inputK.cols() != input_data_x.cols()) || (input_data_x.cols() != input_data_y.rows())) {
+		std::cerr << "GPMatern12 : Matrix dimensions do not coincide. Loading failed" << std::endl;
+		return;
+	}
+
+	number_of_samples = inputK.cols();
+	K = inputK;
+	alpha = input_alpha;
+	data_x = input_data_x / length_scale;
+	data_y = input_data_y;
+}
+
 // Private Functions
-bool GaussianProcessMatern32::check_collected(Eigen::Vector3d x) {
+bool GaussianProcessMatern12::check_collected(Eigen::Vector3d x) {
 	if (number_of_samples == 0)
 		return false;
 
@@ -125,29 +157,32 @@ bool GaussianProcessMatern32::check_collected(Eigen::Vector3d x) {
 	return false;
 }
 
-double GaussianProcessMatern32::kernel(Eigen::Vector3d x_1, 
+double GaussianProcessMatern12::kernel(Eigen::Vector3d x_1, 
                                        Eigen::Vector3d x_2) {
 	double r = (x_1 - x_2).norm();
 
-	return (1 + std::sqrt(3.0) * r) * std::exp(-std::sqrt(3.0) * r);
+	return std::exp(-r);
 }
 
-Eigen::RowVector3d GaussianProcessMatern32::gradient_kernel(Eigen::Vector3d x_1,
+Eigen::RowVector3d GaussianProcessMatern12::gradient_kernel(Eigen::Vector3d x_1,
                                                             Eigen::Vector3d x_2) {
 	double r = (x_1 - x_2).norm();
 
-	return -3.0 * (x_1 - x_2).transpose() * std::exp(-std::sqrt(3.0) * r);
+
+	if (r < 1.0e-3) {
+		return - ((x_1 - x_2).normalized());
+	}
+
+	return -((x_1 - x_2) / r) * std::exp(-r);
 }
 
-Eigen::Matrix3d GaussianProcessMatern32::hessian_kernel(Eigen::Vector3d x_1,
+Eigen::Matrix3d GaussianProcessMatern12::hessian_kernel(Eigen::Vector3d x_1,
 		                                                    Eigen::Vector3d x_2) {
 	double r = (x_1 - x_2).norm();
 
 	if (r < 1.0e-3) {
-		return -3.0 * Eigen::Matrix3d::Identity() * std::exp(-std::sqrt(3.0) * r);
+		return 
 	}
 
-	return (-3.0 * Eigen::Matrix3d::Identity() + 
-	         3.0 * std::sqrt(3.0) * ((x_1 - x_2) *  (x_1 - x_2).transpose()) / r ) * 
-	         std::exp(-std::sqrt(3.0) * r);
+	return 
 }

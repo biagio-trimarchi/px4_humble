@@ -1,0 +1,6 @@
+float64[3] position
+---
+float64[] estimate
+float64[] gradient_estimate
+float64[] hessian_estimate   # Columns-wise encoding is prefered
+

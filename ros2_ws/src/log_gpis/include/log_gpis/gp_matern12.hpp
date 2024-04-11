@@ -1,20 +1,21 @@
 #pragma once
 // LIBRARIES
 // C++ Standard Libraries
+#include <iostream>
 #include <cmath>
 
 // Third Party Libraries
 #include <Eigen/Dense>
 
 // CLASSES
-class GaussianProcessMatern32 {
+class GaussianProcessMatern12 {
 	public:
 		// Constructors/Destructor
-		GaussianProcessMatern32();
-		GaussianProcessMatern32(double length_scale, 
+		GaussianProcessMatern12();
+		GaussianProcessMatern12(double length_scale, 
 		                        double error_variance,
-														double resolution);
-		~GaussianProcessMatern32();
+                                        double resolution);
+		~GaussianProcessMatern12();
 		// Functions
 		void add_sample(Eigen::Vector3d x, double y);
 		void train();
@@ -23,6 +24,17 @@ class GaussianProcessMatern32 {
 		Eigen::Matrix3d hessian_posterior_mean(Eigen::Vector3d x);
 		double posterior_variance(Eigen::Vector3d x);
 		Eigen::RowVector3d gradient_posterior_variance(Eigen::Vector3d x);
+
+		// Get and Set
+		Eigen::MatrixXd getK();
+		Eigen::MatrixXd getAlpha();
+		Eigen::MatrixXd getDataX();
+		Eigen::MatrixXd getDataY();
+
+		void loadData(const Eigen::MatrixXd& inputK,
+                  const Eigen::MatrixXd& input_alpha,
+                  const Eigen::MatrixXd& input_data_x,
+                  const Eigen::VectorXd& input_data_y);
 	
 	private:
 		// Functions

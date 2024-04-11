@@ -9,15 +9,16 @@ GazeboManager::GazeboManager() : Node("gazebo_manager") {
 	this->declare_parameter("tf_world_name", "map");
 	this->declare_parameter("tf_odometry_name", "odometry");
 	this->declare_parameter("tf_drone_name", "drone");
-	this->declare_parameter("world_name", "lgpis_test_1");
+	this->declare_parameter("world_name", "chamber_1");
 	// this->declare_parameter("world_name", "casy_scenario_1");
 
 	this->declare_parameter("gp_lambda_whittle", 7.5);
 	this->declare_parameter("gp_resolution", 0.1);
 	this->declare_parameter("gp_error_variance", 0.01);
 
-	this->declare_parameter("load_world", true);
-	this->declare_parameter("save_world", false);
+	this->declare_parameter("load_world", false);
+	this->declare_parameter("save_world", true);
+	this->declare_parameter("is_gpis_multiple", true);
 	
 	// Get parameters
 	this->get_parameter("topic_gazebo_drone_odometry", topic_gazebo_drone_odometry);
@@ -33,6 +34,7 @@ GazeboManager::GazeboManager() : Node("gazebo_manager") {
 
 	this->get_parameter("load_world", load_world);
 	this->get_parameter("save_world", save_world);
+	this->get_parameter("is_gpis_multiple", is_gpis_multiple);
 
 	// Callback groups
 	callback_group_visualization = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -77,6 +79,12 @@ GazeboManager::GazeboManager() : Node("gazebo_manager") {
               std::placeholders::_1, std::placeholders::_2)
   );
 
+	service_multipleLogGPIS = this->create_service<log_gpis::srv::MultipleQueryEstimate>(
+    "/barrier_function_multi", 
+    std::bind(&GazeboManager::multipleLogGPISCallback, this, 
+              std::placeholders::_1, std::placeholders::_2)
+  );
+
 	// TF
 	tf_static_broadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
 	tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -85,33 +93,39 @@ GazeboManager::GazeboManager() : Node("gazebo_manager") {
 	initializeWorld();
 
 	// Debug
-	// double test_distance
-	// Eigen::Vector3d test_point;
-	// Test sphere
-	// Eigen::Vector3d sphere_center = Eigen::Vector3d(2.0, 2.0, 1.0);
-	// double sphere_radius = 2.0;
-	// test_point = Eigen::Vector3d(5.0, 6.0, -3.0);
-	// test_distance = distanceFromSphere(test_point, sphere_center, sphere_radius);
-	
-	// Test cube
-	// Test cylinder
 }
 
 GazeboManager::~GazeboManager() {}
 
 void GazeboManager::initializeWorld() {
-	log_gpis = LogGPIS(gp_lambda_whittle, gp_resolution, gp_error_variance);
+	if (!is_gpis_multiple)
+		log_gpis = LogGPIS(gp_lambda_whittle, gp_resolution, gp_error_variance);
+
 	std::string path_data_directory = ament_index_cpp::get_package_share_directory("simulation_manager") + "/data/";
 	if (load_world) {
-		loadWorld(world_name, path_data_directory, log_gpis);
+		if (is_gpis_multiple) {
+			loadWorld(world_name, path_data_directory, log_gpis_vector,
+			          gp_lambda_whittle, gp_resolution, gp_error_variance);
+		} else {
+			loadWorld(world_name, path_data_directory, log_gpis);
+		}
 		RCLCPP_INFO(this->get_logger(), "World loaded!");
 		return;
 	} 
 
-	buildWorld(world_name, log_gpis);
+	if (is_gpis_multiple) {
+		buildWorld(world_name, log_gpis_vector,
+               gp_lambda_whittle, gp_resolution, gp_error_variance);
+	} else {
+		buildWorld(world_name, log_gpis);
+	}
 
 	if (save_world) {
-		saveWorld(world_name, path_data_directory, log_gpis);
+		if (is_gpis_multiple) {
+			saveWorld(world_name, path_data_directory, log_gpis_vector);
+		} else {
+			saveWorld(world_name, path_data_directory, log_gpis);
+		}
 		RCLCPP_INFO(this->get_logger(), "World saved!");
 	}
 }
@@ -208,20 +222,36 @@ void GazeboManager::logGPISCallback(const std::shared_ptr<log_gpis::srv::QueryEs
 	response->hessian_estimate[8] = hessian(2, 2);
 }
 
-void GazeboManager::realDistanceCallback(const std::shared_ptr<log_gpis::srv::QueryEstimate::Request> request,
-                                         const std::shared_ptr<log_gpis::srv::QueryEstimate::Response> response) {
-	Eigen::Vector3d position(request->position[0], request->position[1], request->position[2]);
-	response->estimate = 0;
+void GazeboManager::multipleLogGPISCallback(const std::shared_ptr<log_gpis::srv::MultipleQueryEstimate::Request> request,
+                                         const std::shared_ptr<log_gpis::srv::MultipleQueryEstimate::Response> response) {
+	for (unsigned int i=0; i < log_gpis_vector.size(); ++i) {
+		Eigen::Vector3d position(request->position[0], request->position[1], request->position[2]);
+		response->estimate.push_back(log_gpis.evaluate(position));
 
-	if (world_name == "lgpis_test_1") {
-		
+		Eigen::RowVector3d gradient = log_gpis.gradient(position);
+		response->gradient_estimate.push_back(gradient(0));
+		response->gradient_estimate.push_back(gradient(1));
+		response->gradient_estimate.push_back(gradient(2));
+
+		Eigen::Matrix3d hessian = log_gpis.hessian(position);
+		response->hessian_estimate.push_back(hessian(0, 0));
+		response->hessian_estimate.push_back(hessian(0, 1));
+		response->hessian_estimate.push_back(hessian(0, 2));
+
+		response->hessian_estimate.push_back(hessian(1, 0));
+		response->hessian_estimate.push_back(hessian(1, 1));
+		response->hessian_estimate.push_back(hessian(1, 2));
+
+		response->hessian_estimate.push_back(hessian(2, 0));
+		response->hessian_estimate.push_back(hessian(2, 1));
+		response->hessian_estimate.push_back(hessian(2, 2));
 	}
-
-	
 }
+
 
 void GazeboManager::visualizationCallback() {
 	RCLCPP_INFO(this->get_logger(), "Preparing message...");
+	RCLCPP_INFO(this->get_logger(), "Number of processes: %ld", log_gpis_vector.size());
 
 	debug_message.header.frame_id = "map";
 	debug_message.header.stamp = this->get_clock()->now();
@@ -250,11 +280,23 @@ void GazeboManager::visualizationCallback() {
 
 void GazeboManager::scanRegion() {
 	double scan_resolution = 0.3;
-	for (double x = -4.0; x < 4.1; x+=scan_resolution){
-		for (double y = -4.0; y < 4.1; y+=scan_resolution){
-			for (double z = -1.0; z < 4.1; z+=scan_resolution){
+	for (double x = -1.0; x < 30.1; x+=scan_resolution){
+		for (double y = -5.1; y < 5.1; y+=scan_resolution){
+			for (double z = -1.0; z < 10.1; z+=scan_resolution){
 				Eigen::Vector3d scan_point(x, y, z);
-				if (log_gpis.evaluate(scan_point) < 0.1) {
+				bool is_near = false;
+				if (is_gpis_multiple) {
+					for (auto it=log_gpis_vector.begin(); it != log_gpis_vector.end(); ++it) {
+						if ((*it)->evaluate(scan_point) < 0.1) {
+							is_near = true;
+							break;
+						}
+					} 
+				} else {
+					if (log_gpis.evaluate(scan_point) < 0.1)
+						is_near = true;
+				}
+				 if (is_near) {
 					geometry_msgs::msg::Point point;
 					point.x = x;
 					point.y = y;

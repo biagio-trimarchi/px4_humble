@@ -1,5 +1,0 @@
-#!/bin/bash
-
-ros2 topic pub --once /start_mission std_msgs/msg/Empty {}\ 
-
-
